@@ -12,6 +12,11 @@ public class Vectorf2
 		return sum;
 	}
 
+	public static float crossProduct(Vectorf2 lhs, Vectorf2 rhs)
+	{
+		return lhs.x * rhs.x + lhs.y * rhs.y;
+	}
+
 	public static Vectorf2 divide(Vectorf2 lhs, float scalar)
 	{
 		Vectorf2 product = lhs.copy();
@@ -38,9 +43,12 @@ public class Vectorf2
 		return dot;
 	}
 
-	public static float crossProduct(Vectorf2 lhs, Vectorf2 rhs)
+	public static float getProximity(Vectorf2 lhs, Vectorf2 rhs)
 	{
-		return lhs.x * rhs.x + lhs.y * rhs.y;
+		Vectorf2 difference = lhs;
+		difference.subtract(rhs);
+
+		return difference.getMagnitude();
 	}
 
 	public static Vectorf2 multiply(Vectorf2 lhs, float scalar)
@@ -57,14 +65,6 @@ public class Vectorf2
 		product.multiply(rhs);
 
 		return product;
-	}
-
-	public static float getProximity(Vectorf2 lhs, Vectorf2 rhs)
-	{
-		Vectorf2 difference = lhs;
-		difference.subtract(rhs);
-
-		return difference.getMagnitude();
 	}
 
 	public static Vectorf2 subtract(Vectorf2 lhs, Vectorf2 rhs)
@@ -124,11 +124,13 @@ public class Vectorf2
 		return x == rhs.x && y == rhs.y;
 	}
 
+	@JSONIgnore
 	public float getMagnitude()
 	{
 		return (float) Math.sqrt(getMagnitudeSquared());
 	}
 
+	@JSONIgnore
 	public float getMagnitudeSquared()
 	{
 		float magnitudeSquared = 0.0f;
@@ -139,9 +141,18 @@ public class Vectorf2
 		return magnitudeSquared;
 	}
 
+	@JSONIgnore
 	public float getRotation()
 	{
 		return (float) Math.acos(dotProduct(ZERO_HEADING, this) / (1.0f * getMagnitude()));
+	}
+
+	public float getX() {
+		return x;
+	}
+
+	public float getY() {
+		return y;
 	}
 
 	public void multiply(float scalar)
@@ -176,10 +187,18 @@ public class Vectorf2
 		x = tempX;
 	}
 
-	public void setToUnitRotation(float radians)
+	public void toUnitRotation(float radians)
 	{
 		x = (float) Math.sin(Math.PI - radians);
 		y = (float) Math.cos(Math.PI -radians);
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public void setY(float y) {
+		this.y = y;
 	}
 
 	public void subtract(Vectorf2 rhs)

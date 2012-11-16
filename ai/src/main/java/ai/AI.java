@@ -1,6 +1,6 @@
 package ai;
 
-import common.Blackboard;
+import common.Data;
 import common.Plane;
 import common.Vectorf2;
 
@@ -8,7 +8,7 @@ public class AI
 {
 	public static void calculateNewHeadings(float deltaTime)
 	{
-		for (Plane plane : Blackboard.getInstance().getPlanes())
+		for (Plane plane : Data.getInstance().planes)
 		{
 			new SteeringAgent(plane).think(deltaTime);
 		}
@@ -16,17 +16,17 @@ public class AI
 
 	public static void calculateRepulsionRadii()
 	{
-		for (Plane plane : Blackboard.getInstance().getPlanes())
+		for (Plane plane : Data.getInstance().planes)
 		{
-			plane.repulsionRadius = plane.collisionRadius + plane.speed;
+			plane.setRepulsion_radius(plane.collision_radius + plane.speed);
 		}
 	}
 
 	public static void calculateWaypoints()
 	{
-		for (Plane plane : Blackboard.getInstance().getPlanes())
+		for (Plane plane : Data.getInstance().planes)
 		{
-			plane.newWaypoint = Vectorf2.add(plane.position, Vectorf2.multiply(plane.newHeading, plane.speed));
+			plane.new_waypoint = Vectorf2.add(plane.position, Vectorf2.multiply(plane.new_heading, plane.speed));
 		}
 	}
 
@@ -36,7 +36,7 @@ public class AI
 		{
 			float deltaTime = 0.0f; // TODO!
 
-			readState();
+			readData();
 			calculateRepulsionRadii();
 			calculateNewHeadings(deltaTime);
 			readWaypoints();
@@ -45,7 +45,7 @@ public class AI
 		}
 	}
 
-	public static void readState()
+	public static void readData()
 	{
 		// TODO!
 	}

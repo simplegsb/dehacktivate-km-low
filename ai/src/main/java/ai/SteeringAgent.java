@@ -1,8 +1,6 @@
 package ai;
 
-import java.util.List;
-
-import common.Blackboard;
+import common.Data;
 import common.Obstacle;
 import common.Plane;
 import common.Vectorf2;
@@ -27,11 +25,11 @@ public class SteeringAgent
 	{
 		Vectorf2 cumulativeRepulsionEffect = new Vectorf2();
 
-		for (Obstacle obstacle : Blackboard.getInstance().getObstacles())
+		for (Obstacle obstacle : Data.getInstance().obstacles)
 		{
 			Vectorf2 repulsionEffect = Vectorf2.subtract(plane.position, obstacle.position);
 			float distanceBetween = repulsionEffect.getMagnitude();
-			float repulsionRadiusSum = plane.repulsionRadius + obstacle.repulsionRadius;
+			float repulsionRadiusSum = plane.repulsion_radius + obstacle.repulsion_radius;
 
 			if (Vectorf2.dotProduct(plane.heading, repulsionEffect) < 0.0f &&
 					distanceBetween < repulsionRadiusSum)
@@ -43,7 +41,7 @@ public class SteeringAgent
 			}
 		}
 
-		for (Plane plane : Blackboard.getInstance().getPlanes())
+		for (Plane plane : Data.getInstance().planes)
 		{
 			// We don't want the plane to repel itself...
 			if (plane == this.plane)
@@ -52,7 +50,7 @@ public class SteeringAgent
 			}
 			Vectorf2 repulsionEffect = Vectorf2.subtract(this.plane.position, plane.position);
 			float distanceBetween = repulsionEffect.getMagnitude();
-			float repulsionRadiusSum = this.plane.repulsionRadius + plane.repulsionRadius;
+			float repulsionRadiusSum = this.plane.repulsion_radius + plane.repulsion_radius;
 
 			if (Vectorf2.dotProduct(this.plane.heading, repulsionEffect) < 0.0f &&
 					distanceBetween < repulsionRadiusSum)
@@ -81,10 +79,10 @@ public class SteeringAgent
 	{
 		Vectorf2 toDestination = Vectorf2.subtract(destination, plane.position);
 		float angleToDestination = plane.heading.angleTo(toDestination);
-		float turnAngle = Math.min(angleToDestination, plane.turnSpeed);
+		float turnAngle = Math.min(angleToDestination, plane.turn_speed);
 
 		Vectorf2 newHeading = new Vectorf2();
-		newHeading.setToUnitRotation(turnAngle);
+		newHeading.toUnitRotation(turnAngle);
 
 		Vectorf2 repulsionEffect = getRepulsionEffect();
 		repulsionEffect.multiply(2.0f); // Multiplied by two so that it is more urgent.
@@ -92,7 +90,7 @@ public class SteeringAgent
 
 		newHeading.normalize();
 
-		plane.newHeading = newHeading;
-		plane.newRotation = newHeading.getRotation();
+		plane.new_heading = newHeading;
+		plane.new_rotation = newHeading.getRotation();
 	}
 }
