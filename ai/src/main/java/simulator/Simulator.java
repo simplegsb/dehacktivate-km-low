@@ -21,9 +21,15 @@ public class Simulator
 			float deltaTime = 0.0f; // TODO!
 
 			Instructions.setInstance(JSON.fromFileToObject(Instructions.class, "instructions.json", 1024));
+			updateWaypoints();
 			simulator.advance(deltaTime);
 			JSON.fromObjectToFile(Data.getInstance(), "data.json");
 		}
+	}
+
+	public static void updateWaypoints()
+	{
+		// TODO!
 	}
 
 	public int planeId;
