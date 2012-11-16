@@ -1,8 +1,13 @@
 package common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Plane
 {
 	public float collisionRadius;
+	
+	public int currentWaypointIndex;
 
 	public Vectorf2 heading;
 
@@ -21,4 +26,6 @@ public class Plane
 	public float speed;
 	
 	public float turnSpeed;
+
+	public List<Vectorf2> waypoints = new ArrayList<Vectorf2>();
 }

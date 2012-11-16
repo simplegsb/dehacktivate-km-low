@@ -1,5 +1,6 @@
 package ai;
 
+import common.Blackboard;
 import common.Plane;
 import common.Vectorf2;
 
@@ -40,7 +41,7 @@ public class AI
 			calculateNewHeadings(deltaTime);
 			readWaypoints();
 			calculateWaypoints();
-			writeWaypoints();
+			writeInstructions();
 		}
 	}
 
@@ -54,7 +55,7 @@ public class AI
 		// TODO!
 	}
 
-	public static void writeWaypoints()
+	public static void writeInstructions()
 	{
 		// TODO!
 	}

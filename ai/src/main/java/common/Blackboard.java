@@ -1,9 +1,7 @@
-package ai;
+package common;
 
 import java.util.List;
 
-import common.Obstacle;
-import common.Plane;
 
 public class Blackboard
 {

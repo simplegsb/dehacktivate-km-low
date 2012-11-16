@@ -2,6 +2,7 @@ package ai;
 
 import java.util.List;
 
+import common.Blackboard;
 import common.Obstacle;
 import common.Plane;
 import common.Vectorf2;
