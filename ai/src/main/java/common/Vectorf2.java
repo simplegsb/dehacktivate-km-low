@@ -2,7 +2,7 @@ package common;
 
 public class Vectorf2
 {
-	public static Vectorf2 ZERO_HEADING = new Vectorf2(1.0f, 0.0f);
+	public static Vectorf2 ZERO_HEADING = new Vectorf2(0.0f, 1.0f);
 
 	public static Vectorf2 add(Vectorf2 lhs, Vectorf2 rhs)
 	{
