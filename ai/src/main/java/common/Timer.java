@@ -4,20 +4,22 @@ public class Timer
 {
 	private static long ONE_BILLION = 1000000000L;
 
+	private static long ONE_MILLION = 1000000L;
+
 	private long deltaTime;
 
 	private long elapsedTime;
 
 	private long startTime;
 
-	public long getDeltaTime()
+	public float getDeltaTime()
 	{
-		return deltaTime;
+		return (float) deltaTime / ONE_BILLION;
 	}
 
-	public long getElapsedTime()
+	public float getElapsedTime()
 	{
-		return elapsedTime;
+		return (float) elapsedTime / ONE_BILLION;
 	}
 
 	public void start()
@@ -34,17 +36,20 @@ public class Timer
 		elapsedTime = time - startTime;
 	}
 
-	public void waitUntilDeltaReaches(float fractionOfASecond)
+	public void waitUntilDeltaReaches(float deltaTime)
 	{
 		long currentDeltaTime = System.nanoTime() - (startTime + elapsedTime);
-		long targetDeltaTime = (long) (fractionOfASecond * ONE_BILLION);
+		long targetDeltaTime = (long) (deltaTime * ONE_BILLION);
 
-		try
+		if (targetDeltaTime > currentDeltaTime)
 		{
-			Thread.sleep(targetDeltaTime - currentDeltaTime);
-		}
-		catch (InterruptedException e)
-		{
+			try
+			{
+				Thread.sleep((targetDeltaTime - currentDeltaTime) / ONE_MILLION);
+			}
+			catch (InterruptedException e)
+			{
+			}
 		}
 	}
 }

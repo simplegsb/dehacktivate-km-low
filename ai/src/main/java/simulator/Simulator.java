@@ -35,7 +35,9 @@ public class Simulator
 				instructionsFile.delete();
 			}
 			updateWaypoints();
+
 			simulator.advance(timer.getDeltaTime());
+
 			JSON.toFile(Data.getInstance(), "data.json");
 
 			if (SimulatorConfig.getInstance().frame_rate_cap != 0)
@@ -147,9 +149,9 @@ public class Simulator
 		plane.speed = 100.0f;
 		plane.turn_speed = 10.0f;
 
-		if (Math.random() % 2 == 0)
+		if (Math.random() >= 0.5)
 		{
-			if (Math.random() % 2 == 0)
+			if (Math.random() >= 0.5)
 			{
 				plane.heading.x = -1.0f;
 				plane.position.x = SimulatorConfig.getInstance().boundary.max.x;
@@ -161,14 +163,14 @@ public class Simulator
 			}
 
 			float yRange = SimulatorConfig.getInstance().boundary.max.y - SimulatorConfig.getInstance().boundary.min.y;
-			plane.position.y = (float) Math.random() % yRange;
+			plane.position.y = (float) (SimulatorConfig.getInstance().boundary.min.y + Math.random() * yRange);
 		}
 		else
 		{
 			float xRange = SimulatorConfig.getInstance().boundary.max.x - SimulatorConfig.getInstance().boundary.min.x;
-			plane.position.x = (float) Math.random() % xRange;
+			plane.position.x = (float) (SimulatorConfig.getInstance().boundary.min.x + Math.random() * xRange);
 
-			if (Math.random() % 2 == 0)
+			if (Math.random() >= 0.5)
 			{
 				plane.heading.y = -1.0f;
 				plane.position.y = SimulatorConfig.getInstance().boundary.max.y;
