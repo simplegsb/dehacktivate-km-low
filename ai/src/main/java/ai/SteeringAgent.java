@@ -59,6 +59,8 @@ public class SteeringAgent
 	{
 		Vectorf2 toDestination = Vectorf2.subtract(plane.destination, plane.position);
 		float angleToDestination = plane.heading.angleTo(toDestination);
+
+		// Turn as fast as possible until the plane gets to the destination bearing.
 		float turnAngle = Math.min(angleToDestination, plane.turn_speed * deltaTime);
 
 		Vectorf2 newHeading = plane.heading.copy();
@@ -69,21 +71,12 @@ public class SteeringAgent
 		repulsionEffect.multiply(AIConfig.getInstance().repulsion_strength_factor);
 		newHeading.add(repulsionEffect);
 
-		newHeading.normalize();
-
 		// We need the waypoint to lead the plane by enough so that it isn't constantly being reached.
 		// Every time we reach a waypoint we increase the size of the waypoint array we need to re-create
 		// which in turn increases the file size etc.
+		newHeading.normalize();
 		newHeading.multiply(plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor);
 
 		plane.waypoints.add(plane.current_waypoint_index, Vectorf2.add(plane.position, newHeading));
-
-		// CLIENT SIDE PREDICITION
-		// Update the plane's position and rotation in case we don't hear back from the server in time for
-		// the next frame.
-		plane.heading.rotate(turnAngle);
-		plane.rotation += turnAngle;
-
-		plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
 	}
 }

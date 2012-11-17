@@ -17,7 +17,7 @@ public class JSON
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <ObjectType> ObjectType fromFileToObject(Class<ObjectType> clazz, String fileName,
+	public static <ObjectType> ObjectType fromFile(Class<ObjectType> clazz, String fileName,
 			int initialCapacity)
 	{
 		try
@@ -43,7 +43,7 @@ public class JSON
 		return null;
 	}
 
-	public static void fromObjectToFile(Object object, String fileName)
+	public static void toFile(Object object, String fileName)
 	{
 		try
 		{

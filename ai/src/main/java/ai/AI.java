@@ -1,8 +1,11 @@
 package ai;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import common.Data;
+import common.Instruction;
 import common.Instructions;
 import common.JSON;
 import common.Plane;
@@ -42,11 +45,11 @@ public class AI
 			// Re-read the config file once a second for tweaking on the fly.
 			if (configDelta >= 1.0f)
 			{
-				Instructions.setInstance(JSON.fromFileToObject(Instructions.class, "ai-config.json", 256));
+				Instructions.setInstance(JSON.fromFile(Instructions.class, "ai-config.json", 256));
 				configDelta = 0.0f;
 			}
 
-			Data.setInstance(JSON.fromFileToObject(Data.class, "data.json", 2048));
+			Data.setInstance(JSON.fromFile(Data.class, "data.json", 2048));
 			// Calculate some extra data based on what is given...
 			calculateData();
 
@@ -72,6 +75,17 @@ public class AI
 
 	public static void writeInstructions()
 	{
-		// TODO!
+		List<Instruction> instructions = new ArrayList<Instruction>();
+
+		for (Plane plane : Data.getInstance().planes)
+		{
+			Instruction instruction = new Instruction();
+			instruction.plane_id = plane.id;
+			instruction.waypoints = plane.waypoints;
+
+			instructions.add(instruction);
+		}
+
+		JSON.toFile(instructions, "instructions.json");
 	}
 }

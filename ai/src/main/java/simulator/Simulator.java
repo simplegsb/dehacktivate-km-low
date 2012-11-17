@@ -14,7 +14,7 @@ public class Simulator
 {
 	public static void main(String[] args)
 	{
-		SimulatorConfig.setInstance(JSON.fromFileToObject(SimulatorConfig.class, "simulator-config.json", 128));
+		SimulatorConfig.setInstance(JSON.fromFile(SimulatorConfig.class, "simulator-config.json", 128));
 		Data.getInstance().boundary = SimulatorConfig.getInstance().boundary;
 		Data.getInstance().runway = SimulatorConfig.getInstance().runway;
 
@@ -29,12 +29,12 @@ public class Simulator
 			File instructionsFile = new File("instructions.json");
 			if (instructionsFile.exists())
 			{
-				Instructions.setInstance(JSON.fromFileToObject(Instructions.class, "instructions.json", 1024));
+				Instructions.setInstance(JSON.fromFile(Instructions.class, "instructions.json", 1024));
 				instructionsFile.delete();
 			}
 			updateWaypoints();
 			simulator.advance(timer.getDeltaTime());
-			JSON.fromObjectToFile(Data.getInstance(), "data.json");
+			JSON.toFile(Data.getInstance(), "data.json");
 		}
 	}
 
