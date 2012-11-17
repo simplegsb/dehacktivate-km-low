@@ -40,9 +40,9 @@ public class Data
 		return boundary;
 	}
 
-	public List<Object> getObjects()
+	public List<MileHighObject> getObjects()
 	{
-		List<Object> objects = new ArrayList<Object>();
+		List<MileHighObject> objects = new ArrayList<MileHighObject>();
 		objects.addAll(obstacles);
 		objects.addAll(planes);
 		

@@ -1,7 +1,7 @@
 package ai;
 
 import common.Data;
-import common.Obstacle;
+import common.MileHighObject;
 import common.Plane;
 import common.Vectorf2;
 
@@ -25,34 +25,19 @@ public class SteeringAgent
 	{
 		Vectorf2 cumulativeRepulsionEffect = new Vectorf2();
 
-		for (Obstacle obstacle : Data.getInstance().obstacles)
-		{
-			Vectorf2 repulsionEffect = Vectorf2.subtract(plane.position, obstacle.position);
-			float distanceBetween = repulsionEffect.getMagnitude();
-			float repulsionRadiusSum = plane.repulsion_radius + obstacle.repulsion_radius;
-
-			if (Vectorf2.dotProduct(plane.heading, repulsionEffect) < 0.0f &&
-					distanceBetween < repulsionRadiusSum)
-			{
-				float repulsionFactor = (repulsionRadiusSum - distanceBetween) / repulsionRadiusSum;
-				repulsionEffect.normalize();
-				repulsionEffect.multiply(repulsionFactor);
-				cumulativeRepulsionEffect.add(repulsionEffect);
-			}
-		}
-
-		for (Plane plane : Data.getInstance().planes)
+		for (MileHighObject object : Data.getInstance().getObjects())
 		{
 			// We don't want the plane to repel itself...
-			if (plane == this.plane)
+			if (object == plane)
 			{
 				continue;
 			}
-			Vectorf2 repulsionEffect = Vectorf2.subtract(this.plane.position, plane.position);
-			float distanceBetween = repulsionEffect.getMagnitude();
-			float repulsionRadiusSum = this.plane.repulsion_radius + plane.repulsion_radius;
 
-			if (Vectorf2.dotProduct(this.plane.heading, repulsionEffect) < 0.0f &&
+			Vectorf2 repulsionEffect = Vectorf2.subtract(plane.position, object.position);
+			float distanceBetween = repulsionEffect.getMagnitude();
+			float repulsionRadiusSum = plane.repulsion_radius + object.repulsion_radius;
+
+			if (Vectorf2.dotProduct(plane.heading, repulsionEffect) < 0.0f &&
 					distanceBetween < repulsionRadiusSum)
 			{
 				float repulsionFactor = (repulsionRadiusSum - distanceBetween) / repulsionRadiusSum;
