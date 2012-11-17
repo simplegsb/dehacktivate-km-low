@@ -1,0 +1,9 @@
+# Maven project management
+ai/target
+
+# Eclipse project management
+*.classpath
+*.metadata
+*.project
+*.settings
+
