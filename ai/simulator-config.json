@@ -4,8 +4,8 @@
 		"min":{"x":50,"y":50},
 		"max":{"x":1050,"y":1050}
 	},
+	"frame_rate_cap":10,
 	"runway":{"x":50,"y":50},
 	"spawn_frequency":20.0,
 	"waypoint_reached_threshold":10.0
 }
-

@@ -5,37 +5,20 @@ import java.util.List;
 
 public class Instructions
 {
-	private static Instructions instance;
+	private static List<Instruction> instance;
 
-	public static Instructions getInstance()
+	public static List<Instruction> getInstance()
 	{
 		if (instance == null)
 		{
-			instance = new Instructions();
+			instance = new ArrayList<Instruction>();
 		}
 
 		return instance;
 	}
 
-	public static void setInstance(Instructions instance)
+	public static void setInstance(List<Instruction> instance)
 	{
 		Instructions.instance = instance;
-	}
-
-	public Instructions()
-	{
-		instructions = new ArrayList<Instruction>();
-	}
-
-	public List<Instruction> instructions;
-
-	public List<Instruction> getInstructions()
-	{
-		return instructions;
-	}
-
-	public void setInstructions(List<Instruction> instructions)
-	{
-		this.instructions = instructions;
 	}
 }

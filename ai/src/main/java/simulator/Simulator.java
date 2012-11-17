@@ -1,6 +1,7 @@
 package simulator;
 
 import java.io.File;
+import java.util.List;
 
 import common.Data;
 import common.Instruction;
@@ -12,6 +13,7 @@ import common.Vectorf2;
 
 public class Simulator
 {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
 		SimulatorConfig.setInstance(JSON.fromFile(SimulatorConfig.class, "simulator-config.json", 128));
@@ -29,18 +31,23 @@ public class Simulator
 			File instructionsFile = new File("instructions.json");
 			if (instructionsFile.exists())
 			{
-				Instructions.setInstance(JSON.fromFile(Instructions.class, "instructions.json", 1024));
+				Instructions.setInstance(JSON.fromFile(List.class, "instructions.json", 1024));
 				instructionsFile.delete();
 			}
 			updateWaypoints();
 			simulator.advance(timer.getDeltaTime());
 			JSON.toFile(Data.getInstance(), "data.json");
+
+			if (SimulatorConfig.getInstance().frame_rate_cap != 0)
+			{
+				timer.waitUntilDeltaReaches(1.0f / SimulatorConfig.getInstance().frame_rate_cap);
+			}
 		}
 	}
 
 	public static void updateWaypoints()
 	{
-		for (Instruction instruction : Instructions.getInstance().instructions)
+		for (Instruction instruction : Instructions.getInstance())
 		{
 			Plane plane = Data.getInstance().planes.get(instruction.plane_id);
 

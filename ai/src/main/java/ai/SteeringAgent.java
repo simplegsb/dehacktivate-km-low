@@ -76,6 +76,7 @@ public class SteeringAgent
 		// which in turn increases the file size etc.
 		newHeading.normalize();
 		newHeading.multiply(plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor);
+		// TODO Rotate as well or the plane will not fly correctly at slower frame rates (it will turn too slowly)...
 
 		plane.waypoints.add(plane.current_waypoint_index, Vectorf2.add(plane.position, newHeading));
 	}

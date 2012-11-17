@@ -1,8 +1,6 @@
 package ai;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import common.Data;
 import common.Instruction;
@@ -45,7 +43,7 @@ public class AI
 			// Re-read the config file once a second for tweaking on the fly.
 			if (configDelta >= 1.0f)
 			{
-				Instructions.setInstance(JSON.fromFile(Instructions.class, "ai-config.json", 256));
+				AIConfig.setInstance(JSON.fromFile(AIConfig.class, "ai-config.json", 256));
 				configDelta = 0.0f;
 			}
 
@@ -70,22 +68,25 @@ public class AI
 			}
 
 			writeInstructions();
+
+			if (AIConfig.getInstance().frame_rate_cap != 0)
+			{
+				timer.waitUntilDeltaReaches(1.0f / AIConfig.getInstance().frame_rate_cap);
+			}
 		}
 	}
 
 	public static void writeInstructions()
 	{
-		List<Instruction> instructions = new ArrayList<Instruction>();
-
 		for (Plane plane : Data.getInstance().planes)
 		{
 			Instruction instruction = new Instruction();
 			instruction.plane_id = plane.id;
 			instruction.waypoints = plane.waypoints;
 
-			instructions.add(instruction);
+			Instructions.getInstance().add(instruction);
 		}
 
-		JSON.toFile(instructions, "instructions.json");
+		JSON.toFile(Instructions.getInstance(), "instructions.json");
 	}
 }

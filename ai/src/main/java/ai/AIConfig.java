@@ -19,9 +19,16 @@ public class AIConfig
 		AIConfig.instance = instance;
 	}
 
+	public int frame_rate_cap;
+
 	public float repulsion_strength_factor;
 
 	public float steering_waypoint_lead_factor;
+
+	public int getFrame_rate_cap()
+	{
+		return frame_rate_cap;
+	}
 
 	public float getRepulsion_strength_factor()
 	{
@@ -31,6 +38,11 @@ public class AIConfig
 	public float getSteering_waypoint_lead_factor()
 	{
 		return steering_waypoint_lead_factor;
+	}
+
+	public void setFrame_rate_cap(int frame_rate_cap)
+	{
+		this.frame_rate_cap = frame_rate_cap;
 	}
 
 	public void setRepulsion_strength_factor(float repulsion_strength_factor)

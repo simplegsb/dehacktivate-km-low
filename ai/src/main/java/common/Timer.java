@@ -2,6 +2,8 @@ package common;
 
 public class Timer
 {
+	private static long ONE_BILLION = 1000000000L;
+
 	private long deltaTime;
 
 	private long elapsedTime;
@@ -30,5 +32,19 @@ public class Timer
 		long time = System.nanoTime();
 		deltaTime = time - (startTime + elapsedTime);
 		elapsedTime = time - startTime;
+	}
+
+	public void waitUntilDeltaReaches(float fractionOfASecond)
+	{
+		long currentDeltaTime = System.nanoTime() - (startTime + elapsedTime);
+		long targetDeltaTime = (long) (fractionOfASecond * ONE_BILLION);
+
+		try
+		{
+			Thread.sleep(targetDeltaTime - currentDeltaTime);
+		}
+		catch (InterruptedException e)
+		{
+		}
 	}
 }

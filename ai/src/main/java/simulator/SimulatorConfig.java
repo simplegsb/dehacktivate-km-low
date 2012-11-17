@@ -24,6 +24,8 @@ public class SimulatorConfig
 
 	public Rectangle boundary;
 
+	public int frame_rate_cap;
+
 	public Vectorf2 runway;
 
 	public float spawn_frequency;
@@ -33,6 +35,11 @@ public class SimulatorConfig
 	public Rectangle getBoundary()
 	{
 		return boundary;
+	}
+
+	public int getFrame_rate_cap()
+	{
+		return frame_rate_cap;
 	}
 
 	public Vectorf2 getRunway()
@@ -53,6 +60,11 @@ public class SimulatorConfig
 	public void setBoundary(Rectangle boundary)
 	{
 		this.boundary = boundary;
+	}
+
+	public void setFrame_rate_cap(int frame_rate_cap)
+	{
+		this.frame_rate_cap = frame_rate_cap;
 	}
 
 	public void setRunway(Vectorf2 runway)
