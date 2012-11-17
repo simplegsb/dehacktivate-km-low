@@ -63,21 +63,24 @@ public class SteeringAgent
 		// Turn as fast as possible until the plane gets to the destination bearing.
 		float turnAngle = Math.min(angleToDestination, plane.turn_speed * deltaTime);
 
-		Vectorf2 newHeading = plane.heading.copy();
-		newHeading.rotate(turnAngle);
+		Vectorf2 toWaypoint = plane.heading.copy();
+		toWaypoint.rotate(turnAngle);
 
 		Vectorf2 repulsionEffect = getRepulsionEffect();
 		// Multiplied by two so that it is more urgent.
 		repulsionEffect.multiply(AIConfig.getInstance().repulsion_strength_factor);
-		newHeading.add(repulsionEffect);
+		toWaypoint.add(repulsionEffect);
 
 		// We need the waypoint to lead the plane by enough so that it isn't constantly being reached.
 		// Every time we reach a waypoint we increase the size of the waypoint array we need to re-create
 		// which in turn increases the file size etc.
-		newHeading.normalize();
-		newHeading.multiply(plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor);
-		// TODO Rotate as well or the plane will not fly correctly at slower frame rates (it will turn too slowly)...
+		toWaypoint.normalize();
+		toWaypoint.multiply(plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor);
 
-		plane.waypoints.add(plane.current_waypoint_index, Vectorf2.add(plane.position, newHeading));
+		float deltaAngle = toWaypoint.getRotation() - toDestination.getRotation();
+		float deltaAngleWithLead = deltaAngle * plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor;
+		toWaypoint.rotate(deltaAngleWithLead - deltaAngle);
+
+		plane.waypoints.add(plane.current_waypoint_index, Vectorf2.add(plane.position, toWaypoint));
 	}
 }

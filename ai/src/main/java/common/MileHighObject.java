@@ -1,6 +1,6 @@
 package common;
 
-public class MileHighObject
+public abstract class MileHighObject
 {
 	public float collision_radius;
 
@@ -23,6 +23,8 @@ public class MileHighObject
 		return repulsion_radius;
 	}
 
+	public abstract String getType();
+
 	public void setCollision_radius(float collision_radius)
 	{
 		this.collision_radius = collision_radius;
@@ -36,5 +38,10 @@ public class MileHighObject
 	public void setRepulsion_radius(float repulsion_radius)
 	{
 		this.repulsion_radius = repulsion_radius;
+	}
+
+	@JSONIgnore
+	public void setType(String type)
+	{
 	}
 }

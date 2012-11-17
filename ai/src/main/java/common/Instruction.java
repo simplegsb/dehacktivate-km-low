@@ -22,9 +22,4 @@ public class Instruction
 	{
 		this.plane_id = plane_id;
 	}
-
-	public void setWaypoints(List<Vectorf2> waypoints)
-	{
-		this.waypoints = waypoints;
-	}
 }

@@ -1,13 +1,13 @@
 package common;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class Instructions
 {
-	private static List<Instruction> instance;
+	private static Collection<Instruction> instance;
 
-	public static List<Instruction> getInstance()
+	public static Collection<Instruction> getInstance()
 	{
 		if (instance == null)
 		{
@@ -17,7 +17,7 @@ public class Instructions
 		return instance;
 	}
 
-	public static void setInstance(List<Instruction> instance)
+	public static void setInstance(Collection<Instruction> instance)
 	{
 		Instructions.instance = instance;
 	}

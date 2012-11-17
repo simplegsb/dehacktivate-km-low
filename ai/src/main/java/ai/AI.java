@@ -40,20 +40,22 @@ public class AI
 			timer.tick();
 			configDelta += timer.getDeltaTime();
 
+			Instructions.getInstance().clear();
+
 			// Re-read the config file once a second for tweaking on the fly.
 			if (configDelta >= 1.0f)
 			{
-				AIConfig.setInstance(JSON.fromFile(AIConfig.class, "ai-config.json", 256));
+				AIConfig.setInstance(JSON.fromObjectFile(AIConfig.class, "ai-config.json", 256));
 				configDelta = 0.0f;
 			}
 
-			Data.setInstance(JSON.fromFile(Data.class, "data.json", 2048));
+			Data.setInstance(JSON.fromDataFile("data.json", 2048));
 			// Calculate some extra data based on what is given...
 			calculateData();
 
 			if (new File("waypoints.json").exists())
 			{
-				//Waypoints.setInstance(JSON.fromFileToObject(Waypoints.class, "waypoints.json", 1024));
+				//Instructions.setInstance(JSON.fromInstructionsFile("manual-instructions.json", 1024));
 				//readWaypoints();
 			}
 
@@ -78,6 +80,8 @@ public class AI
 
 	public static void writeInstructions()
 	{
+		Instructions.getInstance().clear();
+
 		for (Plane plane : Data.getInstance().planes)
 		{
 			Instruction instruction = new Instruction();
@@ -87,6 +91,6 @@ public class AI
 			Instructions.getInstance().add(instruction);
 		}
 
-		JSON.toFile(Instructions.getInstance(), "instructions.json");
+		JSON.toArrayFile(Instructions.getInstance(), "instructions.json");
 	}
 }

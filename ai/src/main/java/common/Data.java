@@ -36,7 +36,8 @@ public class Data
 		planes = new ArrayList<Plane>();
 	}
 
-	public Rectangle getBoundary() {
+	public Rectangle getBoundary()
+	{
 		return boundary;
 	}
 
@@ -49,15 +50,23 @@ public class Data
 		return objects;
 	}
 
-	public Vectorf2 getRunway() {
+	public Vectorf2 getRunway()
+	{
 		return runway;
 	}
 
-	public void setBoundary(Rectangle boundary) {
+	public void setBoundary(Rectangle boundary)
+	{
 		this.boundary = boundary;
 	}
 
-	public void setRunway(Vectorf2 runway) {
+	@JSONIgnore
+	public void setObjects(List<MileHighObject> objects)
+	{
+	}
+
+	public void setRunway(Vectorf2 runway)
+	{
 		this.runway = runway;
 	}
 }
