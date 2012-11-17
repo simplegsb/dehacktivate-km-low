@@ -1,9 +1,13 @@
 package simulator;
 
+import java.io.File;
+
 import common.Data;
+import common.Instruction;
 import common.Instructions;
 import common.JSON;
 import common.Plane;
+import common.Timer;
 import common.Vectorf2;
 
 public class Simulator
@@ -15,21 +19,46 @@ public class Simulator
 		Data.getInstance().runway = SimulatorConfig.getInstance().runway;
 
 		Simulator simulator = new Simulator();
+		Timer timer = new Timer();
+		timer.start();
 
 		while (true)
-		{
-			float deltaTime = 0.0f; // TODO!
+		{ 
+			timer.tick();
 
-			Instructions.setInstance(JSON.fromFileToObject(Instructions.class, "instructions.json", 1024));
+			File instructionsFile = new File("instructions.json");
+			if (instructionsFile.exists())
+			{
+				Instructions.setInstance(JSON.fromFileToObject(Instructions.class, "instructions.json", 1024));
+				instructionsFile.delete();
+			}
 			updateWaypoints();
-			simulator.advance(deltaTime);
+			simulator.advance(timer.getDeltaTime());
 			JSON.fromObjectToFile(Data.getInstance(), "data.json");
 		}
 	}
 
 	public static void updateWaypoints()
 	{
-		// TODO!
+		for (Instruction instruction : Instructions.getInstance().instructions)
+		{
+			Plane plane = Data.getInstance().planes.get(instruction.plane_id);
+
+			// Ignore waypoints before the current one.
+			for (int index = plane.current_waypoint_index; index < instruction.waypoints.size(); index++)
+			{
+				if (index < plane.waypoints.size())
+				{
+					// Replace existing waypoints.
+					plane.waypoints.set(index, instruction.waypoints.get(index));
+				}
+				else
+				{
+					// Append new waypoints.
+					plane.waypoints.add(instruction.waypoints.get(index));
+				}
+			}
+		}
 	}
 
 	public int planeId;
@@ -54,18 +83,14 @@ public class Simulator
 		for (Plane plane : Data.getInstance().planes)
 		{
 			float angleToWaypoint = 0.0f;
-			if (!plane.waypoints.isEmpty())
+			if (plane.current_waypoint_index < plane.waypoints.size())
 			{
-				Vectorf2 toWaypoint =
-						Vectorf2.subtract(plane.waypoints.get(plane.current_waypoint_index), plane.position);
-				angleToWaypoint = plane.heading.angleTo(toWaypoint);
-				if (angleToWaypoint > Math.PI)
-				{
-					angleToWaypoint = angleToWaypoint - (2.0f * (float) Math.PI);
-				}
+				angleToWaypoint = getAngleToNextWaypoint(plane);
 			}
 
 			float turnAngle = 0.0f;
+
+			// Turn as fast as possible until the plane gets to the waypoint bearing.
 			if (angleToWaypoint >= 0.0f)
 			{
 				turnAngle = Math.min(angleToWaypoint, plane.turn_speed * deltaTime);
@@ -78,10 +103,29 @@ public class Simulator
 			plane.heading.rotate(turnAngle);
 			plane.rotation += turnAngle;
 
-			Vectorf2 movement = plane.heading.copy();
-			movement.multiply(plane.speed * deltaTime);
-			plane.position.add(movement);
+			plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
 		}
+	}
+
+	public float getAngleToNextWaypoint(Plane plane)
+	{
+		Vectorf2 toWaypoint =
+				Vectorf2.subtract(plane.waypoints.get(plane.current_waypoint_index), plane.position);
+		float angleToWaypoint = plane.heading.angleTo(toWaypoint);
+
+		// If we are turning anti-clockwise, just turn that way 10 degrees as opposed to 350 degrees clockwise.
+		if (angleToWaypoint > Math.PI)
+		{
+			angleToWaypoint = angleToWaypoint - (2.0f * (float) Math.PI);
+		}
+
+		// Has the plane reached the waypoint?
+		if (toWaypoint.getMagnitude() <= SimulatorConfig.getInstance().waypoint_reached_threshold)
+		{
+			plane.current_waypoint_index++;
+		}
+
+		return angleToWaypoint;
 	}
 
 	public void spawnPlane()

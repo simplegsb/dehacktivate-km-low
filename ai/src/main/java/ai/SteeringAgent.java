@@ -7,18 +7,11 @@ import common.Vectorf2;
 
 public class SteeringAgent
 {
-	private Vectorf2 destination;
-
 	private Plane plane;
 
 	public SteeringAgent(Plane plane)
 	{
 		this.plane = plane;
-	}
-
-	public Vectorf2 getDestination()
-	{
-		return destination;
 	}
 
 	private Vectorf2 getRepulsionEffect()
@@ -34,13 +27,20 @@ public class SteeringAgent
 			}
 
 			Vectorf2 repulsionEffect = Vectorf2.subtract(plane.position, object.position);
-			float distanceBetween = repulsionEffect.getMagnitude();
-			float repulsionRadiusSum = plane.repulsion_radius + object.repulsion_radius;
+			float distanceBetweenCenters = repulsionEffect.getMagnitude();
+			float distanceBetweenCollisionRadii =
+					distanceBetweenCenters - (plane.collision_radius + object.collision_radius);
+			float repulsionBuffer = distanceBetweenCenters - (plane.repulsion_radius + object.repulsion_radius);
 
+			// If the plane is getting too close to the repulsion zone and is heading towards it.
+			// Heading towards it is what the dot product tests.
 			if (Vectorf2.dotProduct(plane.heading, repulsionEffect) < 0.0f &&
-					distanceBetween < repulsionRadiusSum)
+					distanceBetweenCollisionRadii < repulsionBuffer)
 			{
-				float repulsionFactor = (repulsionRadiusSum - distanceBetween) / repulsionRadiusSum;
+				// The further into the repulsion zone the plane gets, the more it gets repelled.
+				// The plane should be repelled with full force BEFORE it enters the collision radius.
+				float repulsionFactor = (repulsionBuffer - distanceBetweenCollisionRadii) / repulsionBuffer;
+
 				repulsionEffect.normalize();
 				repulsionEffect.multiply(repulsionFactor);
 				cumulativeRepulsionEffect.add(repulsionEffect);
@@ -55,27 +55,35 @@ public class SteeringAgent
 		return cumulativeRepulsionEffect;
 	}
 
-	public void setDestination(Vectorf2 destination)
-	{
-		this.destination = destination;
-	}
-
 	public void think(float deltaTime)
 	{
-		Vectorf2 toDestination = Vectorf2.subtract(destination, plane.position);
+		Vectorf2 toDestination = Vectorf2.subtract(plane.destination, plane.position);
 		float angleToDestination = plane.heading.angleTo(toDestination);
-		float turnAngle = Math.min(angleToDestination, plane.turn_speed);
+		float turnAngle = Math.min(angleToDestination, plane.turn_speed * deltaTime);
 
-		Vectorf2 newHeading = new Vectorf2();
-		newHeading.toUnitRotation(turnAngle);
+		Vectorf2 newHeading = plane.heading.copy();
+		newHeading.rotate(turnAngle);
 
 		Vectorf2 repulsionEffect = getRepulsionEffect();
-		repulsionEffect.multiply(2.0f); // Multiplied by two so that it is more urgent.
+		// Multiplied by two so that it is more urgent.
+		repulsionEffect.multiply(AIConfig.getInstance().repulsion_strength_factor);
 		newHeading.add(repulsionEffect);
 
 		newHeading.normalize();
 
-		plane.new_heading = newHeading;
-		plane.new_rotation = newHeading.getRotation();
+		// We need the waypoint to lead the plane by enough so that it isn't constantly being reached.
+		// Every time we reach a waypoint we increase the size of the waypoint array we need to re-create
+		// which in turn increases the file size etc.
+		newHeading.multiply(plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor);
+
+		plane.waypoints.add(plane.current_waypoint_index, Vectorf2.add(plane.position, newHeading));
+
+		// CLIENT SIDE PREDICITION
+		// Update the plane's position and rotation in case we don't hear back from the server in time for
+		// the next frame.
+		plane.heading.rotate(turnAngle);
+		plane.rotation += turnAngle;
+
+		plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
 	}
 }

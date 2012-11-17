@@ -28,11 +28,15 @@ public class SimulatorConfig
 
 	public float spawn_frequency;
 
-	public Rectangle getBoundary() {
+	public float waypoint_reached_threshold;
+
+	public Rectangle getBoundary()
+	{
 		return boundary;
 	}
 
-	public Vectorf2 getRunway() {
+	public Vectorf2 getRunway()
+	{
 		return runway;
 	}
 
@@ -41,16 +45,28 @@ public class SimulatorConfig
 		return spawn_frequency;
 	}
 
-	public void setBoundary(Rectangle boundary) {
+	public float getWaypoint_reached_threshold()
+	{
+		return waypoint_reached_threshold;
+	}
+
+	public void setBoundary(Rectangle boundary)
+	{
 		this.boundary = boundary;
 	}
 
-	public void setRunway(Vectorf2 runway) {
+	public void setRunway(Vectorf2 runway)
+	{
 		this.runway = runway;
 	}
 
 	public void setSpawn_frequency(float spawn_frequency)
 	{
 		this.spawn_frequency = spawn_frequency;
+	}
+
+	public void setWaypoint_reached_threshold(float waypoint_reached_threshold)
+	{
+		this.waypoint_reached_threshold = waypoint_reached_threshold;
 	}
 }

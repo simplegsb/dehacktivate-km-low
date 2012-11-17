@@ -7,6 +7,8 @@ public class Plane extends MileHighObject
 {
 	public int current_waypoint_index;
 
+	public Vectorf2 destination;
+
 	public float fuel;
 
 	public Vectorf2 heading;
@@ -14,12 +16,6 @@ public class Plane extends MileHighObject
 	public int id;
 
 	public String name;
-
-	public Vectorf2 new_heading;
-
-	public float new_rotation;
-
-	public Vectorf2 new_waypoint;
 
 	public int penalty;
 
@@ -43,11 +39,18 @@ public class Plane extends MileHighObject
 		return current_waypoint_index;
 	}
 
+	@JSONIgnore
+	public Vectorf2 getDestination()
+	{
+		return destination;
+	}
+
 	public float getFuel()
 	{
 		return fuel;
 	}
 
+	@JSONIgnore
 	public Vectorf2 getHeading()
 	{
 		return heading;
@@ -61,24 +64,6 @@ public class Plane extends MileHighObject
 	public String getName()
 	{
 		return name;
-	}
-
-	@JSONIgnore
-	public Vectorf2 getNew_heading()
-	{
-		return new_heading;
-	}
-
-	@JSONIgnore
-	public float getNew_rotation()
-	{
-		return new_rotation;
-	}
-
-	@JSONIgnore
-	public Vectorf2 getNew_waypoint()
-	{
-		return new_waypoint;
 	}
 
 	public int getPenalty()
@@ -121,6 +106,11 @@ public class Plane extends MileHighObject
 		this.current_waypoint_index = current_waypoint_index;
 	}
 
+	public void setDestination(Vectorf2 destination)
+	{
+		this.destination = destination;
+	}
+
 	public void setFuel(float fuel)
 	{
 		this.fuel = fuel;
@@ -139,21 +129,6 @@ public class Plane extends MileHighObject
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	public void setNew_heading(Vectorf2 new_heading)
-	{
-		this.new_heading = new_heading;
-	}
-
-	public void setNew_rotation(float new_rotation)
-	{
-		this.new_rotation = new_rotation;
-	}
-
-	public void setNew_waypoint(Vectorf2 new_waypoint)
-	{
-		this.new_waypoint = new_waypoint;
 	}
 
 	public void setPenalty(int penalty)
