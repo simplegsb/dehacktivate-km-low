@@ -21,6 +21,9 @@ public class AI
 			plane.heading.toUnitRotation(plane.rotation);
 			plane.repulsion_radius = plane.collision_radius + plane.speed;
 
+			// TODO This just aids in testing because the simulator sends waypoints...
+			plane.waypoints.clear();
+
 			// Re-add reached waypoints so we can tag the new one on the end.
 			while (plane.current_waypoint_index > plane.waypoints.size())
 			{

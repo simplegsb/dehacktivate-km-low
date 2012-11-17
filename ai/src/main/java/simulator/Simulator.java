@@ -1,6 +1,7 @@
 package simulator;
 
 import java.io.File;
+import java.util.Iterator;
 
 import common.Data;
 import common.Instruction;
@@ -26,6 +27,14 @@ public class Simulator
 		{
 			timer.tick();
 
+			// Debugging.
+			System.out.println("Planes:");
+			for (Plane plane : Data.getInstance().planes)
+			{
+				System.out.println("\tPlane " + plane.id + " is at " + plane.position);
+			}
+			// End Debugging.
+
 			File instructionsFile = new File("instructions.json");
 			if (instructionsFile.exists())
 			{
@@ -33,6 +42,18 @@ public class Simulator
 				//instructionsFile.delete();
 			}
 			updateWaypoints();
+
+			// Debugging.
+			System.out.println("Instructions:");
+			for (Instruction instruction : Instructions.getInstance())
+			{
+				System.out.println("\tInstruction for plane " + instruction.plane_id + " contains waypoints:");
+				for (Vectorf2 waypoint : instruction.waypoints)
+				{
+					System.out.println("\t\t" + waypoint);
+				}
+			}
+			// End Debugging.
 
 			simulator.advance(timer.getDeltaTime());
 
@@ -49,7 +70,19 @@ public class Simulator
 	{
 		for (Instruction instruction : Instructions.getInstance())
 		{
-			Plane plane = Data.getInstance().planes.get(instruction.plane_id);
+			Plane plane = null;
+			for (Plane currentPlane : Data.getInstance().planes)
+			{
+				if (currentPlane.id == instruction.plane_id)
+				{
+					plane = currentPlane;
+				}
+			}
+
+			if (plane == null)
+			{
+				continue;
+			}
 
 			// Ignore waypoints before the current one.
 			for (int index = plane.current_waypoint_index; index < instruction.waypoints.size(); index++)
@@ -90,8 +123,11 @@ public class Simulator
 			spawnDelta = 0.0f;
 		}
 
-		for (Plane plane : Data.getInstance().planes)
+		Iterator<Plane> iterator = Data.getInstance().planes.iterator();
+		while (iterator.hasNext())
 		{
+			Plane plane = iterator.next();
+
 			float angleToWaypoint = 0.0f;
 			if (plane.current_waypoint_index < plane.waypoints.size())
 			{
@@ -114,6 +150,24 @@ public class Simulator
 			plane.rotation += turnAngle;
 
 			plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
+
+			if (plane.position.x < SimulatorConfig.getInstance().boundary.min.x ||
+					plane.position.x > SimulatorConfig.getInstance().boundary.max.x ||
+					plane.position.y < SimulatorConfig.getInstance().boundary.min.y ||
+					plane.position.y > SimulatorConfig.getInstance().boundary.max.y)
+			{
+				iterator.remove();
+				System.out.println("Plane " + plane.id + " has left the building (" + plane.position + ").");
+			}
+
+			if (Math.abs(plane.position.x - SimulatorConfig.getInstance().runway.x) <
+					SimulatorConfig.getInstance().waypoint_reached_threshold &&
+					Math.abs(plane.position.y - SimulatorConfig.getInstance().runway.y) <
+					SimulatorConfig.getInstance().waypoint_reached_threshold)
+			{
+				iterator.remove();
+				System.out.println("Plane " + plane.id + " has landed!");
+			}
 		}
 	}
 

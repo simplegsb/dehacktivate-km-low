@@ -35,7 +35,7 @@ public class JSON
 			JSONArray instructionsJson = JSONArray.fromObject(buffer.toString(), CONFIG);
 			Collection<Instruction> instructions = new ArrayList<Instruction>();
 
-			for (int instructionIndex = 0; instructionIndex < instructions.size(); instructionIndex++)
+			for (int instructionIndex = 0; instructionIndex < instructionsJson.size(); instructionIndex++)
 			{
 				JSONObject instructionJson = instructionsJson.getJSONObject(instructionIndex);
 				Instruction instruction = new Instruction();
