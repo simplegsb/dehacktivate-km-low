@@ -60,8 +60,23 @@ public class SteeringAgent
 		Vectorf2 toDestination = Vectorf2.subtract(plane.destination, plane.position);
 		float angleToDestination = plane.heading.angleTo(toDestination);
 
+		// If we are turning anti-clockwise, just turn that way 10 degrees as opposed to 350 degrees clockwise.
+		if (angleToDestination > Math.PI)
+		{
+			angleToDestination -= (2.0f * (float) Math.PI);
+		}
+
+		float turnAngle = 0.0f;
+
 		// Turn as fast as possible until the plane gets to the destination bearing.
-		float turnAngle = Math.min(angleToDestination, plane.turn_speed * deltaTime);
+		if (angleToDestination >= 0.0f)
+		{
+			turnAngle = Math.min(angleToDestination, plane.turn_speed_radians * deltaTime);
+		}
+		else
+		{
+			turnAngle = Math.max(angleToDestination, plane.turn_speed_radians * deltaTime * -1.0f);
+		}
 
 		Vectorf2 toWaypoint = plane.heading.copy();
 		toWaypoint.rotate(turnAngle);
@@ -71,16 +86,9 @@ public class SteeringAgent
 		repulsionEffect.multiply(AIConfig.getInstance().repulsion_strength_factor);
 		toWaypoint.add(repulsionEffect);
 
-		// We need the waypoint to lead the plane by enough so that it isn't constantly being reached.
-		// Every time we reach a waypoint we increase the size of the waypoint array we need to re-create
-		// which in turn increases the file size etc.
 		toWaypoint.normalize();
-		toWaypoint.multiply(plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor);
+		toWaypoint.multiply(plane.speed * deltaTime * AIConfig.getInstance().waypoint_lead_time);
 
-		float deltaAngle = toWaypoint.getRotation() - toDestination.getRotation();
-		float deltaAngleWithLead = deltaAngle * plane.speed * AIConfig.getInstance().steering_waypoint_lead_factor;
-		toWaypoint.rotate(deltaAngleWithLead - deltaAngle);
-
-		plane.waypoints.add(plane.current_waypoint_index, Vectorf2.add(plane.position, toWaypoint));
+		plane.waypoints.add(Vectorf2.add(plane.position, toWaypoint));
 	}
 }

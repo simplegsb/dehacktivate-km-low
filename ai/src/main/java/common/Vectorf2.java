@@ -144,7 +144,7 @@ public class Vectorf2
 	@JSONIgnore
 	public float getRotation()
 	{
-		return (float) Math.acos(dotProduct(ZERO_HEADING, this) / (1.0f * getMagnitude()));
+		return ZERO_HEADING.angleTo(this);
 	}
 
 	public float getX() {
@@ -179,18 +179,25 @@ public class Vectorf2
 
 	public void rotate(float angle)
 	{
-		float cosine = (float) Math.cos(angle);
-		float sine = (float) Math.sin(angle);
+		//float cosine = (float) Math.cos(angle);
+		//float sine = (float) Math.sin(angle);
 
-		float tempX = x * cosine - y * sine;
-		y = x * sine + y * cosine;
+		//float tempX = x * cosine - y * sine;
+		//y = x * sine + y * cosine;
+		//x = tempX;
+
+		float cosine = (float) Math.cos(-angle);
+		float sine = (float) Math.sin(-angle);
+
+		float tempX = x * cosine + y * sine;
+		y = x * -sine + y * cosine;
 		x = tempX;
 	}
 
 	public void toUnitRotation(float radians)
 	{
-		x = (float) Math.sin(Math.PI - radians);
-		y = (float) Math.cos(Math.PI -radians);
+		x = (float) Math.sin(-radians);
+		y = (float) Math.cos(-radians);
 	}
 
 	public void setX(float x) {

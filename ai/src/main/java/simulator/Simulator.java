@@ -139,11 +139,11 @@ public class Simulator
 			// Turn as fast as possible until the plane gets to the waypoint bearing.
 			if (angleToWaypoint >= 0.0f)
 			{
-				turnAngle = Math.min(angleToWaypoint, plane.turn_speed * deltaTime);
+				turnAngle = Math.min(angleToWaypoint, plane.turn_speed_radians * deltaTime);
 			}
 			else
 			{
-				turnAngle = Math.max(angleToWaypoint, plane.turn_speed * deltaTime);
+				turnAngle = Math.max(angleToWaypoint, plane.turn_speed_radians * deltaTime * -1.0f);
 			}
 
 			plane.heading.rotate(turnAngle);
@@ -177,10 +177,10 @@ public class Simulator
 				Vectorf2.subtract(plane.waypoints.get(plane.current_waypoint_index), plane.position);
 		float angleToWaypoint = plane.heading.angleTo(toWaypoint);
 
-		// If we are turning anti-clockwise, just turn that way 10 degrees as opposed to 350 degrees clockwise.
+		// If we are turning clockwise, just turn that way 10 degrees as opposed to 350 degrees anti-clockwise.
 		if (angleToWaypoint > Math.PI)
 		{
-			angleToWaypoint = angleToWaypoint - (2.0f * (float) Math.PI);
+			angleToWaypoint -= (2.0f * (float) Math.PI);
 		}
 
 		// Has the plane reached the waypoint?
@@ -203,6 +203,7 @@ public class Simulator
 		plane.position = new Vectorf2();
 		plane.speed = 100.0f;
 		plane.turn_speed = 10.0f;
+		plane.turn_speed_radians = (float) Math.toRadians(plane.turn_speed);
 
 		if (Math.random() >= 0.5)
 		{

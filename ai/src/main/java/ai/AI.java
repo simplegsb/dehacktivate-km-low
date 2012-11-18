@@ -20,6 +20,7 @@ public class AI
 			plane.heading = new Vectorf2();
 			plane.heading.toUnitRotation(plane.rotation);
 			plane.repulsion_radius = plane.collision_radius + plane.speed;
+			plane.turn_speed_radians = (float) Math.toRadians(plane.turn_speed);
 
 			// TODO This just aids in testing because the simulator sends waypoints...
 			plane.waypoints.clear();
@@ -52,9 +53,12 @@ public class AI
 				configDelta = 0.0f;
 			}
 
-			Data.setInstance(JSON.fromDataFile("data.json", 2048));
-			// Calculate some extra data based on what is given...
-			calculateData();
+			if (new File("data.json").exists())
+			{
+				Data.setInstance(JSON.fromDataFile("data.json", 2048));
+				// Calculate some extra data based on what is given...
+				calculateData();
+			}
 
 			if (new File("waypoints.json").exists())
 			{

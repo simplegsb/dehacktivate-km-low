@@ -23,7 +23,7 @@ public class AIConfig
 
 	public float repulsion_strength_factor;
 
-	public float steering_waypoint_lead_factor;
+	public float waypoint_lead_time;
 
 	public int getFrame_rate_cap()
 	{
@@ -35,9 +35,9 @@ public class AIConfig
 		return repulsion_strength_factor;
 	}
 
-	public float getSteering_waypoint_lead_factor()
+	public float getWaypoint_lead_time()
 	{
-		return steering_waypoint_lead_factor;
+		return waypoint_lead_time;
 	}
 
 	public void setFrame_rate_cap(int frame_rate_cap)
@@ -50,8 +50,8 @@ public class AIConfig
 		this.repulsion_strength_factor = repulsion_strength_factor;
 	}
 
-	public void setSteering_waypoint_lead_factor(float steering_waypoint_lead_factor)
+	public void setWaypoint_lead_time(float waypoint_lead_time)
 	{
-		this.steering_waypoint_lead_factor = steering_waypoint_lead_factor;
+		this.waypoint_lead_time = waypoint_lead_time;
 	}
 }

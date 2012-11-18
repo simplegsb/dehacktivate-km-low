@@ -27,6 +27,8 @@ public class Plane extends MileHighObject
 
 	public float turn_speed;
 
+	public float turn_speed_radians;
+
 	public List<Vectorf2> waypoints;
 
 	public Plane()
@@ -39,21 +41,9 @@ public class Plane extends MileHighObject
 		return current_waypoint_index;
 	}
 
-	@JSONIgnore
-	public Vectorf2 getDestination()
-	{
-		return destination;
-	}
-
 	public float getFuel()
 	{
 		return fuel;
-	}
-
-	@JSONIgnore
-	public Vectorf2 getHeading()
-	{
-		return heading;
 	}
 
 	public int getId()
@@ -106,19 +96,9 @@ public class Plane extends MileHighObject
 		this.current_waypoint_index = current_waypoint_index;
 	}
 
-	public void setDestination(Vectorf2 destination)
-	{
-		this.destination = destination;
-	}
-
 	public void setFuel(float fuel)
 	{
 		this.fuel = fuel;
-	}
-
-	public void setHeading(Vectorf2 heading)
-	{
-		this.heading = heading;
 	}
 
 	public void setId(int id)
