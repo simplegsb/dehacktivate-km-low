@@ -5,11 +5,11 @@ import common.MileHighObject;
 import common.Plane;
 import common.Vectorf2;
 
-public class SteeringAgent
+public class Steerer
 {
 	private Plane plane;
 
-	public SteeringAgent(Plane plane)
+	public Steerer(Plane plane)
 	{
 		this.plane = plane;
 	}
@@ -55,7 +55,7 @@ public class SteeringAgent
 		return cumulativeRepulsionEffect;
 	}
 
-	public void think(float deltaTime)
+	public void steer(float deltaTime)
 	{
 		Vectorf2 toDestination = Vectorf2.subtract(plane.destination, plane.position);
 		float angleToDestination = plane.heading.angleTo(toDestination);
@@ -89,7 +89,6 @@ public class SteeringAgent
 		toWaypoint.normalize();
 		toWaypoint.multiply(plane.speed * AIConfig.getInstance().waypointLeadTime);
 
-		Vectorf2 toWaypointScaled = Vectorf2.add(plane.position, toWaypoint);
 		plane.waypoints.add(Vectorf2.add(plane.position, toWaypoint));
 	}
 }

@@ -1,5 +1,5 @@
 {
 	"frame_rate_cap":10,
 	"repulsion_strength_factor":2.0,
-	"waypoint_lead_time":2.0
+	"waypoint_lead_time":1.0
 }

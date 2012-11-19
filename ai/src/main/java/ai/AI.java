@@ -1,6 +1,8 @@
 package ai;
 
 import java.io.File;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import common.Data;
 import common.Instruction;
@@ -12,6 +14,33 @@ import common.Vectorf2;
 
 public class AI
 {
+	private class PathRunner implements Runnable
+	{
+		private Plane plane;
+
+		public PathRunner(Plane plane)
+		{
+			this.plane = plane;
+		}
+
+		public void run()
+		{
+			AStarPathFinder pathFinder = new AStarPathFinder();
+			//List<Node> path = pathFinder.findPath(start, finish);
+			//PathFollower pathFollower = new PathFollower(plane, path, gridSize);
+
+			// Atomic actions...
+			if (pathFollowers.containsKey(plane))
+			{
+				//pathFollowers.replace(plane, pathFollower);
+			}
+			else
+			{
+				//pathFollowers.putIfAbsent(plane, pathFollower);
+			}
+		}
+	};
+
 	private static void calculateData()
 	{
 		for (Plane plane : Data.getInstance().planes)
@@ -61,14 +90,16 @@ public class AI
 				calculateData();
 			}
 
-			Instructions.getInstance().clear();
-
 			if (new File("manual-instructions.json").exists())
 			{
+				Instructions.getInstance().clear();
 				Instructions.setInstance(JSON.fromInstructionFile("manual-instructions.json", 1024));
 			}
 
 			ai.advance(timer.getDeltaTime());
+
+			Instructions.getInstance().clear();
+			writeInstructions();
 
 			if (AIConfig.getInstance().frameRateCap != 0)
 			{
@@ -77,8 +108,34 @@ public class AI
 		}
 	}
 
+	private static void writeInstructions()
+	{
+		for (Plane plane : Data.getInstance().planes)
+		{
+			Instruction instruction = new Instruction();
+			instruction.planeId = plane.id;
+			instruction.waypoints = plane.waypoints;
+
+			Instructions.getInstance().add(instruction);
+		}
+
+		JSON.toArrayFile(Instructions.getInstance(), "instructions.json");
+	}
+
+	private float pathFindingDelta;
+
+	private ConcurrentMap<Plane, PathFollower> pathFollowers;
+
+	public AI()
+	{
+		pathFindingDelta = 1.0f;
+		pathFollowers = new ConcurrentHashMap<Plane, PathFollower>();
+	}
+
 	public void advance(float deltaTime)
 	{
+		pathFindingDelta += deltaTime;
+
 		for (Plane plane : Data.getInstance().planes)
 		{
 			plane.destination = null;
@@ -96,34 +153,26 @@ public class AI
 			{
 				plane.destination = Data.getInstance().runway;
 
-				// TODO Path finding for planes that didn't have manual waypoints.
-				// Maybe only once per second on separate thread?
-				// When a path is found, the next waypoint on that path should be set to the plane.destination.
-				// That is what the steering agent tries to steer to.
+				if (pathFollowers.get(plane) != null)
+				{
+					pathFollowers.get(plane).follow();
+				}
 			}
 		}
 
-		for (Plane plane : Data.getInstance().planes)
+		if (pathFindingDelta >= 1.0f)
 		{
-			new SteeringAgent(plane).think(deltaTime);
+			for (Plane plane : Data.getInstance().planes)
+			{
+				new Thread(new PathRunner(plane)).start();
+			}
+
+			pathFindingDelta = 0.0f;
 		}
 
-		writeInstructions();
-	}
-
-	private void writeInstructions()
-	{
-		Instructions.getInstance().clear();
-
 		for (Plane plane : Data.getInstance().planes)
 		{
-			Instruction instruction = new Instruction();
-			instruction.planeId = plane.id;
-			instruction.waypoints = plane.waypoints;
-
-			Instructions.getInstance().add(instruction);
+			new Steerer(plane).steer(deltaTime);
 		}
-
-		JSON.toArrayFile(Instructions.getInstance(), "instructions.json");
 	}
 }
