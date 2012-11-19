@@ -2,7 +2,7 @@ package common;
 
 public class Vectorf2
 {
-	public static Vectorf2 ZERO_HEADING = new Vectorf2(0.0f, 1.0f);
+	public static Vectorf2 ZERO_HEADING = new Vectorf2(0.0f, -1.0f);
 
 	public static Vectorf2 add(Vectorf2 lhs, Vectorf2 rhs)
 	{
@@ -179,13 +179,6 @@ public class Vectorf2
 
 	public void rotate(float angle)
 	{
-		//float cosine = (float) Math.cos(angle);
-		//float sine = (float) Math.sin(angle);
-
-		//float tempX = x * cosine - y * sine;
-		//y = x * sine + y * cosine;
-		//x = tempX;
-
 		float cosine = (float) Math.cos(-angle);
 		float sine = (float) Math.sin(-angle);
 
@@ -196,8 +189,8 @@ public class Vectorf2
 
 	public void toUnitRotation(float radians)
 	{
-		x = (float) Math.sin(-radians);
-		y = (float) Math.cos(-radians);
+		x = (float) Math.sin(Math.PI - radians);
+		y = (float) Math.cos(Math.PI - radians);
 	}
 
 	public void setX(float x) {

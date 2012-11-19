@@ -12,21 +12,23 @@ import common.Vectorf2;
 
 public class AI
 {
-	public static void calculateData()
+	private static void calculateData()
 	{
 		for (Plane plane : Data.getInstance().planes)
 		{
-			plane.destination = Data.getInstance().runway;
+			// Rotate 180 degrees to get out of the silly coordinate system where positive y (down) is 0 degrees.
+			// Also adjust because our rotations are in the opposite direction.
+			plane.rotation = (float) Math.toRadians(plane.rotation * -1.0f + 180.0f);
 			plane.heading = new Vectorf2();
 			plane.heading.toUnitRotation(plane.rotation);
-			plane.repulsion_radius = plane.collision_radius + plane.speed;
-			plane.turn_speed_radians = (float) Math.toRadians(plane.turn_speed);
+			plane.repulsionRadius = plane.collisionRadius + plane.speed;
+			plane.turnSpeed = (float) Math.toRadians(plane.turnSpeed);
 
 			// TODO This just aids in testing because the simulator sends waypoints...
 			plane.waypoints.clear();
 
 			// Re-add reached waypoints so we can tag the new one on the end.
-			while (plane.current_waypoint_index > plane.waypoints.size())
+			while (plane.currentWaypointIndex > plane.waypoints.size())
 			{
 				plane.waypoints.add(new Vectorf2());
 			}
@@ -35,6 +37,7 @@ public class AI
 
 	public static void main(String[] args)
 	{
+		AI ai = new AI();
 		Timer timer = new Timer();
 		timer.start();
 		float configDelta = 1.0f;
@@ -43,8 +46,6 @@ public class AI
 		{
 			timer.tick();
 			configDelta += timer.getDeltaTime();
-
-			Instructions.getInstance().clear();
 
 			// Re-read the config file once a second for tweaking on the fly.
 			if (configDelta >= 1.0f)
@@ -60,39 +61,64 @@ public class AI
 				calculateData();
 			}
 
-			if (new File("waypoints.json").exists())
+			Instructions.getInstance().clear();
+
+			if (new File("manual-instructions.json").exists())
 			{
-				//Instructions.setInstance(JSON.fromInstructionsFile("manual-instructions.json", 1024));
-				//readWaypoints();
+				Instructions.setInstance(JSON.fromInstructionFile("manual-instructions.json", 1024));
 			}
 
-			// TODO Path finding for planes that didn't have manual waypoints.
-			// Maybe only once per second on separate thread?
-			// When a path is found, the next waypoint on that path should be set to the plane.destination.
-			// That is what the steering agent tries to steer to.
+			ai.advance(timer.getDeltaTime());
 
-			for (Plane plane : Data.getInstance().planes)
+			if (AIConfig.getInstance().frameRateCap != 0)
 			{
-				new SteeringAgent(plane).think(timer.getDeltaTime());
-			}
-
-			writeInstructions();
-
-			if (AIConfig.getInstance().frame_rate_cap != 0)
-			{
-				timer.waitUntilDeltaReaches(1.0f / AIConfig.getInstance().frame_rate_cap);
+				timer.waitUntilDeltaReaches(1.0f / AIConfig.getInstance().frameRateCap);
 			}
 		}
 	}
 
-	public static void writeInstructions()
+	public void advance(float deltaTime)
+	{
+		for (Plane plane : Data.getInstance().planes)
+		{
+			plane.destination = null;
+
+			for (Instruction instruction : Instructions.getInstance())
+			{
+				if (instruction.planeId == plane.id)
+				{
+					plane.destination = instruction.waypoints.get(0);
+					break;
+				}
+			}
+
+			if (plane.destination == null)
+			{
+				plane.destination = Data.getInstance().runway;
+
+				// TODO Path finding for planes that didn't have manual waypoints.
+				// Maybe only once per second on separate thread?
+				// When a path is found, the next waypoint on that path should be set to the plane.destination.
+				// That is what the steering agent tries to steer to.
+			}
+		}
+
+		for (Plane plane : Data.getInstance().planes)
+		{
+			new SteeringAgent(plane).think(deltaTime);
+		}
+
+		writeInstructions();
+	}
+
+	private void writeInstructions()
 	{
 		Instructions.getInstance().clear();
 
 		for (Plane plane : Data.getInstance().planes)
 		{
 			Instruction instruction = new Instruction();
-			instruction.plane_id = plane.id;
+			instruction.planeId = plane.id;
 			instruction.waypoints = plane.waypoints;
 
 			Instructions.getInstance().add(instruction);

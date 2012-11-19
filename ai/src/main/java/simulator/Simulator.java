@@ -47,7 +47,7 @@ public class Simulator
 			System.out.println("Instructions:");
 			for (Instruction instruction : Instructions.getInstance())
 			{
-				System.out.println("\tInstruction for plane " + instruction.plane_id + " contains waypoints:");
+				System.out.println("\tInstruction for plane " + instruction.planeId + " contains waypoints:");
 				for (Vectorf2 waypoint : instruction.waypoints)
 				{
 					System.out.println("\t\t" + waypoint);
@@ -59,21 +59,21 @@ public class Simulator
 
 			JSON.toObjectFile(Data.getInstance(), "data.json");
 
-			if (SimulatorConfig.getInstance().frame_rate_cap != 0)
+			if (SimulatorConfig.getInstance().frameRateCap != 0)
 			{
-				timer.waitUntilDeltaReaches(1.0f / SimulatorConfig.getInstance().frame_rate_cap);
+				timer.waitUntilDeltaReaches(1.0f / SimulatorConfig.getInstance().frameRateCap);
 			}
 		}
 	}
 
-	public static void updateWaypoints()
+	private static void updateWaypoints()
 	{
 		for (Instruction instruction : Instructions.getInstance())
 		{
 			Plane plane = null;
 			for (Plane currentPlane : Data.getInstance().planes)
 			{
-				if (currentPlane.id == instruction.plane_id)
+				if (currentPlane.id == instruction.planeId)
 				{
 					plane = currentPlane;
 				}
@@ -85,7 +85,7 @@ public class Simulator
 			}
 
 			// Ignore waypoints before the current one.
-			for (int index = plane.current_waypoint_index; index < instruction.waypoints.size(); index++)
+			for (int index = plane.currentWaypointIndex; index < instruction.waypoints.size(); index++)
 			{
 				if (index < plane.waypoints.size())
 				{
@@ -111,13 +111,13 @@ public class Simulator
 	{
 		planeId = 0;
 		score = 0;
-		spawnDelta = SimulatorConfig.getInstance().spawn_frequency;
+		spawnDelta = SimulatorConfig.getInstance().spawnFrequency;
 	}
 
 	public void advance(float deltaTime)
 	{
 		spawnDelta += deltaTime;
-		if (spawnDelta >= SimulatorConfig.getInstance().spawn_frequency)
+		if (spawnDelta >= SimulatorConfig.getInstance().spawnFrequency)
 		{
 			spawnPlane();
 			spawnDelta = 0.0f;
@@ -129,7 +129,7 @@ public class Simulator
 			Plane plane = iterator.next();
 
 			float angleToWaypoint = 0.0f;
-			if (plane.current_waypoint_index < plane.waypoints.size())
+			if (plane.currentWaypointIndex < plane.waypoints.size())
 			{
 				angleToWaypoint = getAngleToNextWaypoint(plane);
 			}
@@ -139,11 +139,11 @@ public class Simulator
 			// Turn as fast as possible until the plane gets to the waypoint bearing.
 			if (angleToWaypoint >= 0.0f)
 			{
-				turnAngle = Math.min(angleToWaypoint, plane.turn_speed_radians * deltaTime);
+				turnAngle = Math.min(angleToWaypoint, plane.turnSpeed * deltaTime);
 			}
 			else
 			{
-				turnAngle = Math.max(angleToWaypoint, plane.turn_speed_radians * deltaTime * -1.0f);
+				turnAngle = Math.max(angleToWaypoint, plane.turnSpeed * deltaTime * -1.0f);
 			}
 
 			plane.heading.rotate(turnAngle);
@@ -161,9 +161,9 @@ public class Simulator
 			}
 
 			if (Math.abs(plane.position.x - SimulatorConfig.getInstance().runway.x) <
-					SimulatorConfig.getInstance().waypoint_reached_threshold &&
+					SimulatorConfig.getInstance().waypointReachedThreshold &&
 					Math.abs(plane.position.y - SimulatorConfig.getInstance().runway.y) <
-					SimulatorConfig.getInstance().waypoint_reached_threshold)
+					SimulatorConfig.getInstance().waypointReachedThreshold)
 			{
 				iterator.remove();
 				System.out.println("Plane " + plane.id + " has landed!");
@@ -171,39 +171,38 @@ public class Simulator
 		}
 	}
 
-	public float getAngleToNextWaypoint(Plane plane)
+	private float getAngleToNextWaypoint(Plane plane)
 	{
 		Vectorf2 toWaypoint =
-				Vectorf2.subtract(plane.waypoints.get(plane.current_waypoint_index), plane.position);
+				Vectorf2.subtract(plane.waypoints.get(plane.currentWaypointIndex), plane.position);
 		float angleToWaypoint = plane.heading.angleTo(toWaypoint);
 
-		// If we are turning clockwise, just turn that way 10 degrees as opposed to 350 degrees anti-clockwise.
+		// If we are turning 350 degrees one way, just turn 10 degrees the other way instead.
 		if (angleToWaypoint > Math.PI)
 		{
 			angleToWaypoint -= (2.0f * (float) Math.PI);
 		}
 
 		// Has the plane reached the waypoint?
-		if (toWaypoint.getMagnitude() <= SimulatorConfig.getInstance().waypoint_reached_threshold)
+		if (toWaypoint.getMagnitude() <= SimulatorConfig.getInstance().waypointReachedThreshold)
 		{
-			plane.current_waypoint_index++;
+			plane.currentWaypointIndex++;
 		}
 
 		return angleToWaypoint;
 	}
 
-	public void spawnPlane()
+	private void spawnPlane()
 	{
 		Plane plane = new Plane();
-		
-		plane.collision_radius = 10.0f;
-		plane.current_waypoint_index = 0;
+
+		plane.collisionRadius = 10.0f;
+		plane.currentWaypointIndex = 0;
 		plane.heading = new Vectorf2();
 		plane.id = planeId++;
 		plane.position = new Vectorf2();
 		plane.speed = 100.0f;
-		plane.turn_speed = 10.0f;
-		plane.turn_speed_radians = (float) Math.toRadians(plane.turn_speed);
+		plane.turnSpeed = (float) Math.PI;
 
 		if (Math.random() >= 0.5)
 		{

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Plane extends MileHighObject
 {
-	public int current_waypoint_index;
+	public int currentWaypointIndex;
 
 	public Vectorf2 destination;
 
@@ -25,9 +25,7 @@ public class Plane extends MileHighObject
 
 	public float speed;
 
-	public float turn_speed;
-
-	public float turn_speed_radians;
+	public float turnSpeed;
 
 	public List<Vectorf2> waypoints;
 
@@ -38,7 +36,7 @@ public class Plane extends MileHighObject
 
 	public int getCurrent_waypoint_index()
 	{
-		return current_waypoint_index;
+		return currentWaypointIndex;
 	}
 
 	public float getFuel()
@@ -68,7 +66,10 @@ public class Plane extends MileHighObject
 
 	public float getRotation()
 	{
-		return rotation;
+		// Rotate to get INTO the silly coordinate system where positive y (down) is 0 degrees.
+		// Also adjust because our rotations are in the opposite direction.
+		// This is only used by the simulator when it creates data.json.
+		return (float) Math.toDegrees(rotation * -1.0f + Math.PI);
 	}
 
 	public float getSpeed()
@@ -78,7 +79,8 @@ public class Plane extends MileHighObject
 
 	public float getTurn_speed()
 	{
-		return turn_speed;
+		// This is only used by the simulator when it creates data.json.
+		return (float) Math.toDegrees(turnSpeed);
 	}
 
 	public String getType()
@@ -93,7 +95,7 @@ public class Plane extends MileHighObject
 
 	public void setCurrent_waypoint_index(int current_waypoint_index)
 	{
-		this.current_waypoint_index = current_waypoint_index;
+		this.currentWaypointIndex = current_waypoint_index;
 	}
 
 	public void setFuel(float fuel)
@@ -133,7 +135,7 @@ public class Plane extends MileHighObject
 
 	public void setTurn_speed(float turn_speed)
 	{
-		this.turn_speed = turn_speed;
+		this.turnSpeed = turn_speed;
 	}
 
 	public void setWaypoints(List<Vectorf2> waypoints)

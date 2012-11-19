@@ -24,13 +24,13 @@ public class SimulatorConfig
 
 	public Rectangle boundary;
 
-	public int frame_rate_cap;
+	public int frameRateCap;
 
 	public Vectorf2 runway;
 
-	public float spawn_frequency;
+	public float spawnFrequency;
 
-	public float waypoint_reached_threshold;
+	public float waypointReachedThreshold;
 
 	public Rectangle getBoundary()
 	{
@@ -39,7 +39,7 @@ public class SimulatorConfig
 
 	public int getFrame_rate_cap()
 	{
-		return frame_rate_cap;
+		return frameRateCap;
 	}
 
 	public Vectorf2 getRunway()
@@ -49,12 +49,12 @@ public class SimulatorConfig
 
 	public float getSpawn_frequency()
 	{
-		return spawn_frequency;
+		return spawnFrequency;
 	}
 
 	public float getWaypoint_reached_threshold()
 	{
-		return waypoint_reached_threshold;
+		return waypointReachedThreshold;
 	}
 
 	public void setBoundary(Rectangle boundary)
@@ -64,7 +64,7 @@ public class SimulatorConfig
 
 	public void setFrame_rate_cap(int frame_rate_cap)
 	{
-		this.frame_rate_cap = frame_rate_cap;
+		this.frameRateCap = frame_rate_cap;
 	}
 
 	public void setRunway(Vectorf2 runway)
@@ -74,11 +74,11 @@ public class SimulatorConfig
 
 	public void setSpawn_frequency(float spawn_frequency)
 	{
-		this.spawn_frequency = spawn_frequency;
+		this.spawnFrequency = spawn_frequency;
 	}
 
 	public void setWaypoint_reached_threshold(float waypoint_reached_threshold)
 	{
-		this.waypoint_reached_threshold = waypoint_reached_threshold;
+		this.waypointReachedThreshold = waypoint_reached_threshold;
 	}
 }

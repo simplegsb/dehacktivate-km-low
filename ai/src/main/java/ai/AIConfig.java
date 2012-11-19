@@ -19,39 +19,39 @@ public class AIConfig
 		AIConfig.instance = instance;
 	}
 
-	public int frame_rate_cap;
+	public int frameRateCap;
 
-	public float repulsion_strength_factor;
+	public float repulsionStrengthFactor;
 
-	public float waypoint_lead_time;
+	public float waypointLeadTime;
 
 	public int getFrame_rate_cap()
 	{
-		return frame_rate_cap;
+		return frameRateCap;
 	}
 
 	public float getRepulsion_strength_factor()
 	{
-		return repulsion_strength_factor;
+		return repulsionStrengthFactor;
 	}
 
 	public float getWaypoint_lead_time()
 	{
-		return waypoint_lead_time;
+		return waypointLeadTime;
 	}
 
 	public void setFrame_rate_cap(int frame_rate_cap)
 	{
-		this.frame_rate_cap = frame_rate_cap;
+		this.frameRateCap = frame_rate_cap;
 	}
 
 	public void setRepulsion_strength_factor(float repulsion_strength_factor)
 	{
-		this.repulsion_strength_factor = repulsion_strength_factor;
+		this.repulsionStrengthFactor = repulsion_strength_factor;
 	}
 
 	public void setWaypoint_lead_time(float waypoint_lead_time)
 	{
-		this.waypoint_lead_time = waypoint_lead_time;
+		this.waypointLeadTime = waypoint_lead_time;
 	}
 }

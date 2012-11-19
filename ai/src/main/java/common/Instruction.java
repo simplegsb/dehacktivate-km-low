@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Instruction
 {
-	public int plane_id;
+	public int planeId;
 
 	public List<Vectorf2> waypoints;
 
@@ -16,7 +16,7 @@ public class Instruction
 
 	public int getPlane_id()
 	{
-		return plane_id;
+		return planeId;
 	}
 
 	public List<Vectorf2> getWaypoints()
@@ -26,6 +26,6 @@ public class Instruction
 
 	public void setPlane_id(int plane_id)
 	{
-		this.plane_id = plane_id;
+		this.planeId = plane_id;
 	}
 }

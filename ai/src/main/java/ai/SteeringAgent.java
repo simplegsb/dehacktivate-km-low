@@ -29,8 +29,8 @@ public class SteeringAgent
 			Vectorf2 repulsionEffect = Vectorf2.subtract(plane.position, object.position);
 			float distanceBetweenCenters = repulsionEffect.getMagnitude();
 			float distanceBetweenCollisionRadii =
-					distanceBetweenCenters - (plane.collision_radius + object.collision_radius);
-			float repulsionBuffer = distanceBetweenCenters - (plane.repulsion_radius + object.repulsion_radius);
+					distanceBetweenCenters - (plane.collisionRadius + object.collisionRadius);
+			float repulsionBuffer = distanceBetweenCenters - (plane.repulsionRadius + object.repulsionRadius);
 
 			// If the plane is getting too close to the repulsion zone and is heading towards it.
 			// Heading towards it is what the dot product tests.
@@ -60,7 +60,7 @@ public class SteeringAgent
 		Vectorf2 toDestination = Vectorf2.subtract(plane.destination, plane.position);
 		float angleToDestination = plane.heading.angleTo(toDestination);
 
-		// If we are turning anti-clockwise, just turn that way 10 degrees as opposed to 350 degrees clockwise.
+		// If we are turning 350 degrees one way, just turn 10 degrees the other way instead.
 		if (angleToDestination > Math.PI)
 		{
 			angleToDestination -= (2.0f * (float) Math.PI);
@@ -71,11 +71,11 @@ public class SteeringAgent
 		// Turn as fast as possible until the plane gets to the destination bearing.
 		if (angleToDestination >= 0.0f)
 		{
-			turnAngle = Math.min(angleToDestination, plane.turn_speed_radians * deltaTime);
+			turnAngle = Math.min(angleToDestination, plane.turnSpeed * deltaTime);
 		}
 		else
 		{
-			turnAngle = Math.max(angleToDestination, plane.turn_speed_radians * deltaTime * -1.0f);
+			turnAngle = Math.max(angleToDestination, plane.turnSpeed * deltaTime * -1.0f);
 		}
 
 		Vectorf2 toWaypoint = plane.heading.copy();
@@ -83,12 +83,13 @@ public class SteeringAgent
 
 		Vectorf2 repulsionEffect = getRepulsionEffect();
 		// Multiplied by two so that it is more urgent.
-		repulsionEffect.multiply(AIConfig.getInstance().repulsion_strength_factor);
+		repulsionEffect.multiply(AIConfig.getInstance().repulsionStrengthFactor);
 		toWaypoint.add(repulsionEffect);
 
 		toWaypoint.normalize();
-		toWaypoint.multiply(plane.speed * deltaTime * AIConfig.getInstance().waypoint_lead_time);
+		toWaypoint.multiply(plane.speed * AIConfig.getInstance().waypointLeadTime);
 
+		Vectorf2 toWaypointScaled = Vectorf2.add(plane.position, toWaypoint);
 		plane.waypoints.add(Vectorf2.add(plane.position, toWaypoint));
 	}
 }
