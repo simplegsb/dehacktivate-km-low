@@ -1,0 +1,120 @@
+<html>
+<head>
+    <title>Simulator</title>
+</head>
+<style>
+    #container{
+        width: 1000px;
+        height: 1000px;
+        background: #ccc;
+        position: relative;
+    }
+
+    .plane{
+        width: 8px;
+        height: 8px;
+        margin-left: -4px;
+        margin-top: -4px;
+        background: #f00;
+        position: absolute;
+    }
+</style>
+<body>
+
+<div id="container">
+
+</div>
+
+<script src="jquery-1.8.2.min.js"></script>
+
+<script type="text/javascript">
+    var planes = [],
+            opts = {
+                boundary : {
+                    max : {x:1000, y:1000},
+                    min : {x:0, y: 0}
+                },
+                runway : {
+                    x : 500,
+                    y: 550
+                }
+            },
+            $container = $("#container");
+
+
+
+    function movePlane(data){
+        console.log('movePlane');
+        console.log(data);
+        $('#plane-'+data.id).css({
+            top: (data.position.y - opts.boundary.min.y)+'px',
+            left: (data.position.x - opts.boundary.min.x)+'px'
+        }).attr({
+                    title: 'Fuel Left: '+ data.fuel
+                });
+        console.log($('#plane-'+data.id));
+    }
+
+    function createPlane(data){
+        console.log('createPlane');
+        var $newPlane = $(document.createElement('div'));
+        $newPlane.attr({
+            id: 'plane-'+data.id,
+            class: 'plane'
+        });
+        $container.append($newPlane);
+        movePlane(data);
+    }
+
+    function setOptions(data){
+        console.log('setOptions');
+        opts.boundary.max.y = data.boundary.max.y;
+        opts.boundary.max.x = data.boundary.max.x;
+        opts.boundary.min.y = data.boundary.min.y;
+        opts.boundary.min.x = data.boundary.min.x;
+        opts.runway.x = data.runway.x;
+        opts.runway.y = data.runway.y;
+    }
+
+
+    function checkIfPlaneExists(id){
+        console.log('checkIfPlaneExists');
+        var doesExist = false;
+        for(var i = 0, len = planes.length; i < len; i++){
+            if(id == planes[i].id){
+                doesExist = true;
+                break;
+            }
+        }
+        return doesExist;
+    }
+
+    function ajaxCallback(data){
+        console.log(data);
+        setOptions(data);
+        console.log('ajaxCallback');
+        for(var i = 0, len = data.objects.length; i<len; i++){
+            if(checkIfPlaneExists(data.objects[i].id))
+                movePlane(data.objects[i]);
+            else
+                createPlane(data.objects[i]);
+        }
+    }
+
+    // EXAMPLE OF AN AJAX REQUEST:
+    // UNCOMMENT TO ACTIVATE POLLING
+
+    setInterval(function(){
+     $.ajax({
+         url: 'data.json',
+         dataType: 'json',
+         success: ajaxCallback
+     });
+     }, 100);
+
+    // COMMENT WHEN UNCOMMENTING ABOVE
+    //ajaxCallback(data);
+
+</script>
+</body>
+</html>
