@@ -195,7 +195,7 @@ public class Simulator
 		plane.heading = new Vectorf2();
 		plane.id = planeId++;
 		plane.position = new Vectorf2();
-		plane.speed = 10.0f;
+		plane.speed = 100.0f;
 		plane.turnSpeed = (float) Math.PI;
 
 		if (Math.random() >= 0.5)

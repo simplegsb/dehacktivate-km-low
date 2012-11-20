@@ -6,6 +6,6 @@
 	},
 	"frame_rate_cap":10,
 	"runway":{"x":550,"y":550},
-	"spawn_frequency":20.0,
+	"spawn_frequency":5.0,
 	"waypoint_reached_threshold":5.0
 }

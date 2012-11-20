@@ -34,6 +34,35 @@ public class Plane extends MileHighObject
 		waypoints = new ArrayList<Vectorf2>();
 	}
 
+	@Override
+	public boolean equals(Object object)
+	{
+		if (object == this)
+		{
+			return true;
+		}
+
+		if (!(object instanceof Plane))
+		{
+			return false;
+		}
+
+		if (((Plane) object).id == id)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 7;
+		hash = 31 * hash + id;
+		return hash;
+	}
+
 	public int getCurrent_waypoint_index()
 	{
 		return currentWaypointIndex;
