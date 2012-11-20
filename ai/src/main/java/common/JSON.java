@@ -39,6 +39,7 @@ public class JSON
 			{
 				JSONObject instructionJson = instructionsJson.getJSONObject(instructionIndex);
 				Instruction instruction = new Instruction();
+				instruction.planeId = instructionJson.getInt("plane_id");
 
 				JSONArray waypoints = instructionJson.getJSONArray("waypoints");
 				for (int waypointIndex = 0; waypointIndex < waypoints.size(); waypointIndex++)

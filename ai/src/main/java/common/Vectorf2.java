@@ -99,7 +99,7 @@ public class Vectorf2
 
 	public float angleTo(Vectorf2 rhs)
 	{
-		return (float) Math.acos(dotProduct(this, rhs) / (getMagnitude() * rhs.getMagnitude()));
+		return rhs.getRotation() - getRotation();
 	}
 
 	public Vectorf2 copy()
@@ -144,7 +144,7 @@ public class Vectorf2
 	@JSONIgnore
 	public float getRotation()
 	{
-		return ZERO_HEADING.angleTo(this);
+		return (float) (Math.PI - Math.atan2(x, y));
 	}
 
 	public float getX() {

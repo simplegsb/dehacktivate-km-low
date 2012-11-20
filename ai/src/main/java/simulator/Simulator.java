@@ -70,32 +70,26 @@ public class Simulator
 	{
 		for (Instruction instruction : Instructions.getInstance())
 		{
-			Plane plane = null;
-			for (Plane currentPlane : Data.getInstance().planes)
+			for (Plane plane : Data.getInstance().planes)
 			{
-				if (currentPlane.id == instruction.planeId)
+				if (plane.id == instruction.planeId)
 				{
-					plane = currentPlane;
-				}
-			}
+					// Ignore waypoints before the current one.
+					for (int index = plane.currentWaypointIndex; index < instruction.waypoints.size(); index++)
+					{
+						if (index < plane.waypoints.size())
+						{
+							// Replace existing waypoints.
+							plane.waypoints.set(index, instruction.waypoints.get(index));
+						}
+						else
+						{
+							// Append new waypoints.
+							plane.waypoints.add(instruction.waypoints.get(index));
+						}
+					}
 
-			if (plane == null)
-			{
-				continue;
-			}
-
-			// Ignore waypoints before the current one.
-			for (int index = plane.currentWaypointIndex; index < instruction.waypoints.size(); index++)
-			{
-				if (index < plane.waypoints.size())
-				{
-					// Replace existing waypoints.
-					plane.waypoints.set(index, instruction.waypoints.get(index));
-				}
-				else
-				{
-					// Append new waypoints.
-					plane.waypoints.add(instruction.waypoints.get(index));
+					break;
 				}
 			}
 		}
@@ -147,7 +141,7 @@ public class Simulator
 			}
 
 			plane.heading.rotate(turnAngle);
-			plane.rotation += turnAngle;
+			plane.rotation = plane.heading.getRotation();
 
 			plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
 
@@ -196,12 +190,12 @@ public class Simulator
 	{
 		Plane plane = new Plane();
 
-		plane.collisionRadius = 10.0f;
+		plane.collisionRadius = 20.0f;
 		plane.currentWaypointIndex = 0;
 		plane.heading = new Vectorf2();
 		plane.id = planeId++;
 		plane.position = new Vectorf2();
-		plane.speed = 100.0f;
+		plane.speed = 10.0f;
 		plane.turnSpeed = (float) Math.PI;
 
 		if (Math.random() >= 0.5)

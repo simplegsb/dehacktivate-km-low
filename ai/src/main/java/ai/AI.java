@@ -1,8 +1,6 @@
 package ai;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import common.Data;
 import common.Instruction;
@@ -14,33 +12,6 @@ import common.Vectorf2;
 
 public class AI
 {
-	private class PathRunner implements Runnable
-	{
-		private Plane plane;
-
-		public PathRunner(Plane plane)
-		{
-			this.plane = plane;
-		}
-
-		public void run()
-		{
-			AStarPathFinder pathFinder = new AStarPathFinder();
-			//List<Node> path = pathFinder.findPath(start, finish);
-			//PathFollower pathFollower = new PathFollower(plane, path, gridSize);
-
-			// Atomic actions...
-			if (pathFollowers.containsKey(plane))
-			{
-				//pathFollowers.replace(plane, pathFollower);
-			}
-			else
-			{
-				//pathFollowers.putIfAbsent(plane, pathFollower);
-			}
-		}
-	};
-
 	private static void calculateData()
 	{
 		for (Plane plane : Data.getInstance().planes)
@@ -122,56 +93,25 @@ public class AI
 		JSON.toArrayFile(Instructions.getInstance(), "instructions.json");
 	}
 
-	private float pathFindingDelta;
-
-	private ConcurrentMap<Plane, PathFollower> pathFollowers;
-
-	public AI()
-	{
-		pathFindingDelta = 1.0f;
-		pathFollowers = new ConcurrentHashMap<Plane, PathFollower>();
-	}
-
 	public void advance(float deltaTime)
 	{
-		pathFindingDelta += deltaTime;
-
 		for (Plane plane : Data.getInstance().planes)
 		{
-			plane.destination = null;
-
-			for (Instruction instruction : Instructions.getInstance())
+			// Manual instructions take precedence.
+			/*for (Instruction instruction : Instructions.getInstance())
 			{
 				if (instruction.planeId == plane.id)
 				{
 					plane.destination = instruction.waypoints.get(0);
 					break;
 				}
-			}
+			}*/
 
-			if (plane.destination == null)
+			//if (plane.destination == null)
 			{
 				plane.destination = Data.getInstance().runway;
-
-				if (pathFollowers.get(plane) != null)
-				{
-					pathFollowers.get(plane).follow();
-				}
-			}
-		}
-
-		if (pathFindingDelta >= 1.0f)
-		{
-			for (Plane plane : Data.getInstance().planes)
-			{
-				new Thread(new PathRunner(plane)).start();
 			}
 
-			pathFindingDelta = 0.0f;
-		}
-
-		for (Plane plane : Data.getInstance().planes)
-		{
 			new Steerer(plane).steer(deltaTime);
 		}
 	}
