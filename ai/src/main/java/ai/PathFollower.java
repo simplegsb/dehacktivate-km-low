@@ -92,7 +92,6 @@ public class PathFollower
 		if (Vectorf2.subtract(destination, plane.position).getMagnitude() <= destinationThreshold)
 		{
 			advanceDestinationOnPath(advanceDistance);
-			System.out.println("Plane " + plane.id + " is following to " + destination + ", last waypoint: " + path.get(previousWaypointIndex).getPosition());
 		}
 
 		plane.destination = destination;

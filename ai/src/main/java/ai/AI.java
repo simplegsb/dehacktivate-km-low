@@ -56,8 +56,8 @@ public class AI
 			plane.rotation = (float) Math.toRadians(plane.rotation * -1.0f + 180.0f);
 			plane.heading = new Vectorf2();
 			plane.heading.toUnitRotation(plane.rotation);
-			plane.repulsionRadius = plane.collisionRadius + plane.speed;
 			plane.turnSpeed = (float) Math.toRadians(plane.turnSpeed);
+			plane.repulsionRadius = plane.collisionRadius + (plane.speed / plane.turnSpeed);
 
 			// TODO This just aids in testing because the simulator sends waypoints...
 			plane.waypoints.clear();

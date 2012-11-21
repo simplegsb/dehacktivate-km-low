@@ -30,7 +30,7 @@ public class Steerer
 			float distanceBetweenCenters = repulsionEffect.getMagnitude();
 			float distanceBetweenCollisionRadii =
 					distanceBetweenCenters - (plane.collisionRadius + object.collisionRadius);
-			float repulsionBuffer = distanceBetweenCenters - (plane.repulsionRadius + object.repulsionRadius);
+			float repulsionBuffer = plane.repulsionRadius + object.repulsionRadius;
 
 			// If the plane is getting too close to the repulsion zone and is heading towards it.
 			// Heading towards it is what the dot product tests.
@@ -82,7 +82,6 @@ public class Steerer
 		toWaypoint.rotate(turnAngle);
 
 		Vectorf2 repulsionEffect = getRepulsionEffect();
-		// Multiplied by two so that it is more urgent.
 		repulsionEffect.multiply(AIConfig.getInstance().repulsionStrengthFactor);
 		toWaypoint.add(repulsionEffect);
 
