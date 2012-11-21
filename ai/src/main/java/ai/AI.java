@@ -172,6 +172,11 @@ public class AI
 			}
 			previousFuel.put(plane, plane.fuel);
 
+			if (pathFollowers.get(plane) == null)
+			{
+				addPathFollower(plane);
+			}
+
 			// Manual instructions take precedence.
 			for (Instruction instruction : Instructions.getInstance())
 			{
@@ -189,16 +194,13 @@ public class AI
 					Vectorf2 awayFromRunway = Vectorf2.subtract(plane.position, Data.getInstance().runway);
 					awayFromRunway.normalize();
 					awayFromRunway.multiply(1000000.0f); // Times ONE MILLION! Get out of here!
-					plane.destination = awayFromRunway;
-				}*/
-
-				if (pathFollowers.get(plane) == null)
-				{
-					addPathFollower(plane);
+					plane.destination = Vectorf2.add(plane.position, awayFromRunway);
 				}
-
-				plane.destination = Data.getInstance().runway;
-				pathFollowers.get(plane).follow(plane);
+				else
+				{*/
+					plane.destination = Data.getInstance().runway;
+					pathFollowers.get(plane).follow(plane);
+				//}
 			}
 
 			new Steerer(plane).steer(deltaTime);
