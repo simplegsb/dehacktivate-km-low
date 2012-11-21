@@ -1,7 +1,9 @@
 package simulator;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import common.Data;
 import common.Instruction;
@@ -28,11 +30,11 @@ public class Simulator
 			timer.tick();
 
 			// Debugging.
-			System.out.println("Planes:");
+			/*System.out.println("Planes:");
 			for (Plane plane : Data.getInstance().planes)
 			{
 				System.out.println("\tPlane " + plane.id + " is at " + plane.position);
-			}
+			}*/
 			// End Debugging.
 
 			File instructionsFile = new File("instructions.json");
@@ -44,7 +46,7 @@ public class Simulator
 			updateWaypoints();
 
 			// Debugging.
-			System.out.println("Instructions:");
+			/*System.out.println("Instructions:");
 			for (Instruction instruction : Instructions.getInstance())
 			{
 				System.out.println("\tInstruction for plane " + instruction.planeId + " contains waypoints:");
@@ -52,7 +54,7 @@ public class Simulator
 				{
 					System.out.println("\t\t" + waypoint);
 				}
-			}
+			}*/
 			// End Debugging.
 
 			simulator.advance(timer.getDeltaTime());
@@ -117,6 +119,8 @@ public class Simulator
 			spawnDelta = 0.0f;
 		}
 
+		Set<Plane> collidedPlanes = new HashSet<Plane>();
+
 		Iterator<Plane> iterator = Data.getInstance().planes.iterator();
 		while (iterator.hasNext())
 		{
@@ -145,6 +149,28 @@ public class Simulator
 
 			plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
 
+			for (Plane otherPlane : Data.getInstance().planes)
+			{
+				// Cannot collide with itself...
+				if (otherPlane == plane)
+				{
+					continue;
+				}
+
+				if (Vectorf2.subtract(otherPlane.getPosition(), plane.getPosition()).getMagnitude() <
+						otherPlane.collisionRadius + plane.collisionRadius)
+				{
+					System.out.println("Plane " + plane.id + " has collided with Plane " + otherPlane.id);
+					collidedPlanes.add(plane);
+					collidedPlanes.add(otherPlane);
+				}
+			}
+
+			if (collidedPlanes.contains(plane))
+			{
+				continue;
+			}
+
 			if (plane.position.x < SimulatorConfig.getInstance().boundary.min.x ||
 					plane.position.x > SimulatorConfig.getInstance().boundary.max.x ||
 					plane.position.y < SimulatorConfig.getInstance().boundary.min.y ||
@@ -163,6 +189,8 @@ public class Simulator
 				System.out.println("Plane " + plane.id + " has landed!");
 			}
 		}
+
+		Data.getInstance().planes.removeAll(collidedPlanes);
 	}
 
 	private float getAngleToNextWaypoint(Plane plane)
@@ -190,13 +218,13 @@ public class Simulator
 	{
 		Plane plane = new Plane();
 
-		plane.collisionRadius = 20.0f;
+		plane.collisionRadius = SimulatorConfig.getInstance().collisionRadius;
 		plane.currentWaypointIndex = 0;
 		plane.heading = new Vectorf2();
 		plane.id = planeId++;
 		plane.position = new Vectorf2();
-		plane.speed = 100.0f;
-		plane.turnSpeed = (float) Math.PI;
+		plane.speed = SimulatorConfig.getInstance().speed;
+		plane.turnSpeed = (float) Math.toRadians(SimulatorConfig.getInstance().turnSpeed);
 
 		if (Math.random() >= 0.5)
 		{

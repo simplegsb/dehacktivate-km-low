@@ -1,7 +1,10 @@
 package ai;
 
+import java.util.List;
+
 import common.Data;
 import common.MileHighObject;
+import common.Obstacle;
 import common.Plane;
 import common.Vectorf2;
 
@@ -17,8 +20,28 @@ public class Steerer
 	private Vectorf2 getRepulsionEffect()
 	{
 		Vectorf2 cumulativeRepulsionEffect = new Vectorf2();
+		List<MileHighObject> objects = Data.getInstance().getObjects();
 
-		for (MileHighObject object : Data.getInstance().getObjects())
+		// Repel the edges of the map too, lets not give away points we don't need to!
+		// Although... better to lose a plane than have a crash so lets make these less influential.
+		Obstacle topBoundary = new Obstacle();
+		topBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.min.y);
+		topBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		objects.add(topBoundary);
+		Obstacle leftBoundary = new Obstacle();
+		leftBoundary.position = new Vectorf2(Data.getInstance().boundary.min.x, plane.position.y);
+		leftBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		objects.add(leftBoundary);
+		Obstacle bottomBoundary = new Obstacle();
+		bottomBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.max.y);
+		bottomBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		objects.add(bottomBoundary);
+		Obstacle rightBoundary = new Obstacle();
+		rightBoundary.position = new Vectorf2(Data.getInstance().boundary.max.x, plane.position.y);
+		rightBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		objects.add(rightBoundary);
+
+		for (MileHighObject object : objects)
 		{
 			// We don't want the plane to repel itself...
 			if (object == plane)

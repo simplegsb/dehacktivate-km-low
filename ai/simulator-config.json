@@ -4,8 +4,11 @@
 		"min":{"x":50,"y":50},
 		"max":{"x":1050,"y":1050}
 	},
+	"collision_radius":20.0,
 	"frame_rate_cap":10,
 	"runway":{"x":550,"y":550},
-	"spawn_frequency":5.0,
+	"spawn_frequency":20.0,
+	"speed":10.0,
+	"turn_speed":45.0,
 	"waypoint_reached_threshold":5.0
 }

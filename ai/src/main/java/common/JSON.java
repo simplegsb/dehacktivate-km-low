@@ -55,7 +55,8 @@ public class JSON
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			// Swallowing this exception... sorry.
+			//e.printStackTrace();
 		}
 
 		return null;
@@ -96,7 +97,8 @@ public class JSON
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			// Swallowing this exception... sorry.
+			//e.printStackTrace();
 		}
 
 		return null;
@@ -123,7 +125,8 @@ public class JSON
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			// Swallowing this exception... sorry.
+			//e.printStackTrace();
 		}
 
 		return null;
@@ -140,7 +143,8 @@ public class JSON
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			// Swallowing this exception... sorry.
+			//e.printStackTrace();
 		}
 	}
 
@@ -155,7 +159,8 @@ public class JSON
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			// Swallowing this exception... sorry.
+			//e.printStackTrace();
 		}
 	}
 }
