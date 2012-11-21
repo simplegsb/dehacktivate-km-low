@@ -1,5 +1,9 @@
 {
+	"data_file_path":"data.json",
 	"frame_rate_cap":10,
+	"instructions_file_path":"instructions.json",
+	"low_fuel_threshold":5.0,
+	"override_file_path":"override.json",
 	"repulsion_strength_factor":2.0,
 	"waypoint_lead_time":1.0
 }

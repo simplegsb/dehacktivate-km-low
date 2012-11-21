@@ -18,6 +18,10 @@ public class AI
 {
 	private static List<Node> flightPath;
 
+	private static Map<Plane, Float> fuelUsageRates;
+
+	private static Map<Plane, Float> previousFuel;
+
 	static
 	{
 		flightPath = new ArrayList<Node>();
@@ -45,6 +49,9 @@ public class AI
 		Node node7 = new Node();
 		node7.setPosition(new Vectorf2(550.0f, 275.0f));
 		flightPath.add(node7);
+
+		fuelUsageRates = new HashMap<Plane, Float>();
+		previousFuel = new HashMap<Plane, Float>();
 	}
 
 	private static void calculateData()
@@ -59,7 +66,7 @@ public class AI
 			plane.turnSpeed = (float) Math.toRadians(plane.turnSpeed);
 			plane.repulsionRadius = plane.collisionRadius + (plane.speed / plane.turnSpeed);
 
-			// TODO This just aids in testing because the simulator sends waypoints...
+			// TODO This just aids in testing because the simulator sends waypoints we don't get from the real system...
 			plane.waypoints.clear();
 
 			// Re-add reached waypoints so we can tag the new one on the end.
@@ -89,16 +96,16 @@ public class AI
 				configDelta = 0.0f;
 			}
 
-			if (new File("data.json").exists())
+			if (new File(AIConfig.getInstance().dataFilePath).exists())
 			{
-				Data.setInstance(JSON.fromDataFile("data.json", 2048));
+				Data.setInstance(JSON.fromDataFile(AIConfig.getInstance().dataFilePath, 2048));
 				// Calculate some extra data based on what is given...
 				calculateData();
 			}
 
-			if (new File("manual-instructions.json").exists())
+			if (new File(AIConfig.getInstance().overrideFilePath).exists())
 			{
-				Instructions.setInstance(JSON.fromInstructionFile("manual-instructions.json", 1024));
+				Instructions.setInstance(JSON.fromInstructionFile(AIConfig.getInstance().overrideFilePath, 1024));
 			}
 			else
 			{
@@ -128,7 +135,7 @@ public class AI
 			Instructions.getInstance().add(instruction);
 		}
 
-		JSON.toArrayFile(Instructions.getInstance(), "instructions.json");
+		JSON.toArrayFile(Instructions.getInstance(), AIConfig.getInstance().instructionsFilePath);
 	}
 
 	private Map<Plane, PathFollower> pathFollowers;
@@ -159,6 +166,12 @@ public class AI
 	{
 		for (Plane plane : Data.getInstance().planes)
 		{
+			if (previousFuel.get(plane) != null)
+			{
+				fuelUsageRates.put(plane, (plane.fuel - previousFuel.get(plane)) * deltaTime);
+			}
+			previousFuel.put(plane, plane.fuel);
+
 			// Manual instructions take precedence.
 			for (Instruction instruction : Instructions.getInstance())
 			{
@@ -171,6 +184,14 @@ public class AI
 
 			if (plane.destination == null)
 			{
+				/*if (isFuelLow(plane))
+				{
+					Vectorf2 awayFromRunway = Vectorf2.subtract(plane.position, Data.getInstance().runway);
+					awayFromRunway.normalize();
+					awayFromRunway.multiply(1000000.0f); // Times ONE MILLION! Get out of here!
+					plane.destination = awayFromRunway;
+				}*/
+
 				if (pathFollowers.get(plane) == null)
 				{
 					addPathFollower(plane);
@@ -182,5 +203,15 @@ public class AI
 
 			new Steerer(plane).steer(deltaTime);
 		}
+	}
+
+	private boolean isFuelLow(Plane plane)
+	{
+		if (fuelUsageRates.get(plane) == null)
+		{
+			return false;
+		}
+
+		return fuelUsageRates.get(plane) * plane.fuel <= AIConfig.getInstance().lowFuelThreshold;
 	}
 }
