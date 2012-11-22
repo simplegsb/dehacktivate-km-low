@@ -1,7 +1,6 @@
 package ai;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,40 +15,12 @@ import common.Vectorf2;
 
 public class AI
 {
-	private static List<Node> flightPath;
-
 	private static Map<Plane, Float> fuelUsageRates;
 
 	private static Map<Plane, Float> previousFuel;
 
 	static
 	{
-		flightPath = new ArrayList<Node>();
-		Node node0 = new Node();
-		node0.setPosition(new Vectorf2(275.0f, 275.0f));
-		flightPath.add(node0);
-		Node node1 = new Node();
-		node1.setPosition(new Vectorf2(275.0f, 550.0f));
-		flightPath.add(node1);
-		Node node2 = new Node();
-		node2.setPosition(new Vectorf2(275.0f, 825.0f));
-		flightPath.add(node2);
-		Node node3 = new Node();
-		node3.setPosition(new Vectorf2(550.0f, 825.0f));
-		flightPath.add(node3);
-		Node node4 = new Node();
-		node4.setPosition(new Vectorf2(825.0f, 825.0f));
-		flightPath.add(node4);
-		Node node5 = new Node();
-		node5.setPosition(new Vectorf2(825.0f, 550.0f));
-		flightPath.add(node5);
-		Node node6 = new Node();
-		node6.setPosition(new Vectorf2(825.0f, 275.0f));
-		flightPath.add(node6);
-		Node node7 = new Node();
-		node7.setPosition(new Vectorf2(550.0f, 275.0f));
-		flightPath.add(node7);
-
 		fuelUsageRates = new HashMap<Plane, Float>();
 		previousFuel = new HashMap<Plane, Float>();
 	}
@@ -93,6 +64,7 @@ public class AI
 			if (configDelta >= 1.0f)
 			{
 				AIConfig.setInstance(JSON.fromObjectFile(AIConfig.class, "ai-config.json", 256));
+				FlightPath.setInstance(JSON.fromFlightPathFile(AIConfig.getInstance().flightPathFilePath, 256));
 				configDelta = 0.0f;
 			}
 
@@ -147,7 +119,9 @@ public class AI
 
 	public void addPathFollower(Plane plane)
 	{
+		List<Node> flightPath = FlightPath.getInstance();
 		Node closestNode = null;
+
 		for (Node node : flightPath)
 		{
 			if (closestNode == null || Vectorf2.subtract(node.getPosition(), plane.position).getMagnitude() <

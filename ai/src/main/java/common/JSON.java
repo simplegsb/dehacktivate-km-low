@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import ai.Node;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -17,6 +20,42 @@ public class JSON
 	static
 	{
 		CONFIG.addIgnoreFieldAnnotation(JSONIgnore.class);
+	}
+
+	public static List<Node> fromFlightPathFile(String fileName, int initialCapacity)
+	{
+		try
+		{
+			BufferedReader file = new BufferedReader(new FileReader(fileName));
+			StringBuffer buffer = new StringBuffer(initialCapacity);
+
+			while (file.ready())
+			{
+				buffer.append(file.readLine());
+			}
+			file.close();
+
+			JSONArray flightPathJson = JSONArray.fromObject(buffer.toString(), CONFIG);
+			List<Node> flightPath = new ArrayList<Node>();
+
+			for (int waypointIndex = 0; waypointIndex < flightPathJson.size(); waypointIndex++)
+			{
+				JSONObject waypoint = flightPathJson.getJSONObject(waypointIndex);
+
+				Node node = new Node();
+				node.setPosition((Vectorf2) JSONObject.toBean(waypoint, Vectorf2.class));
+				flightPath.add(node);
+			}
+
+			return flightPath;
+		}
+		catch (Exception e)
+		{
+			// Swallowing this exception... sorry.
+			//e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public static Collection<Instruction> fromInstructionFile(String fileName, int initialCapacity)

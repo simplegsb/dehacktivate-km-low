@@ -1,5 +1,6 @@
 {
 	"data_file_path":"data.json",
+	"flight_path_file_path":"flight-path.json",
 	"frame_rate_cap":10,
 	"instructions_file_path":"instructions.json",
 	"low_fuel_threshold":5.0,

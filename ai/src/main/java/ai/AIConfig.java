@@ -21,6 +21,8 @@ public class AIConfig
 
 	public String dataFilePath;
 
+	public String flightPathFilePath;
+
 	public int frameRateCap;
 
 	public String instructionsFilePath;
@@ -36,6 +38,11 @@ public class AIConfig
 	public String getData_file_path()
 	{
 		return dataFilePath;
+	}
+
+	public String getFlight_path_file_path()
+	{
+		return flightPathFilePath;
 	}
 
 	public int getFrame_rate_cap()
@@ -68,9 +75,14 @@ public class AIConfig
 		return waypointLeadTime;
 	}
 
-	public void setData_file_fath(String dataFilePath)
+	public void setData_file_path(String data_file_path)
 	{
-		this.dataFilePath = dataFilePath;
+		this.dataFilePath = data_file_path;
+	}
+
+	public void setFlight_path_file_path(String flight_path_file_path)
+	{
+		this.flightPathFilePath = flight_path_file_path;
 	}
 
 	public void setFrame_rate_cap(int frame_rate_cap)
