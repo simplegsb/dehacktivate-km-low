@@ -26,19 +26,19 @@ public class Steerer
 		// Although... better to lose a plane than have a crash so lets make these less influential.
 		Obstacle topBoundary = new Obstacle();
 		topBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.min.y);
-		topBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		topBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 		objects.add(topBoundary);
 		Obstacle leftBoundary = new Obstacle();
 		leftBoundary.position = new Vectorf2(Data.getInstance().boundary.min.x, plane.position.y);
-		leftBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		leftBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 		objects.add(leftBoundary);
 		Obstacle bottomBoundary = new Obstacle();
 		bottomBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.max.y);
-		bottomBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		bottomBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 		objects.add(bottomBoundary);
 		Obstacle rightBoundary = new Obstacle();
 		rightBoundary.position = new Vectorf2(Data.getInstance().boundary.max.x, plane.position.y);
-		rightBoundary.collisionRadius = plane.speed / plane.turnSpeed / 2.0f; // Divide by 2.0f, less influence.
+		rightBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 		objects.add(rightBoundary);
 
 		for (MileHighObject object : objects)
@@ -54,6 +54,15 @@ public class Steerer
 			float distanceBetweenCollisionRadii =
 					distanceBetweenCenters - (plane.collisionRadius + object.collisionRadius);
 			float repulsionBuffer = plane.repulsionRadius + object.repulsionRadius;
+
+			if (object instanceof Obstacle)
+			{
+				repulsionBuffer *= AIConfig.getInstance().obstacleRepelFactor;
+			}
+			else if (object instanceof Plane)
+			{
+				repulsionBuffer *= AIConfig.getInstance().planeRepelFactor;
+			}
 
 			// If the plane is getting too close to the repulsion zone and is heading towards it.
 			// Heading towards it is what the dot product tests.

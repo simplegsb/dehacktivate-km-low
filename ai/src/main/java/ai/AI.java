@@ -9,6 +9,7 @@ import common.Data;
 import common.Instruction;
 import common.Instructions;
 import common.JSON;
+import common.Obstacle;
 import common.Plane;
 import common.Timer;
 import common.Vectorf2;
@@ -27,6 +28,13 @@ public class AI
 
 	private static void calculateData()
 	{
+		for (Obstacle obstacle : Data.getInstance().obstacles)
+		{
+			obstacle.collisionRadius =
+					Vectorf2.subtract(obstacle.boundary.max, obstacle.boundary.min).getMagnitude() / 2.0f;
+			obstacle.repulsionRadius = obstacle.collisionRadius * 2.0f;
+		}
+
 		for (Plane plane : Data.getInstance().planes)
 		{
 			// Rotate 180 degrees to get out of the silly coordinate system where positive y (down) is 0 degrees.

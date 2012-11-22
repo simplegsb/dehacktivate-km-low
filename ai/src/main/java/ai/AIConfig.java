@@ -19,6 +19,8 @@ public class AIConfig
 		AIConfig.instance = instance;
 	}
 
+	public float boundaryRepelFactor;
+
 	public String dataFilePath;
 
 	public String flightPathFilePath;
@@ -29,11 +31,20 @@ public class AIConfig
 
 	public float lowFuelThreshold;
 
+	public float obstacleRepelFactor;
+
 	public String overrideFilePath;
+
+	public float planeRepelFactor;
 
 	public float repulsionStrengthFactor;
 
 	public float waypointLeadTime;
+
+	public float getBoundary_repel_factor()
+	{
+		return boundaryRepelFactor;
+	}
 
 	public String getData_file_path()
 	{
@@ -60,9 +71,19 @@ public class AIConfig
 		return lowFuelThreshold;
 	}
 
+	public float getObstacle_repel_factor()
+	{
+		return obstacleRepelFactor;
+	}
+
 	public String getOverride_file_path()
 	{
 		return overrideFilePath;
+	}
+
+	public float getPlane_repel_factor()
+	{
+		return planeRepelFactor;
 	}
 
 	public float getRepulsion_strength_factor()
@@ -73,6 +94,11 @@ public class AIConfig
 	public float getWaypoint_lead_time()
 	{
 		return waypointLeadTime;
+	}
+
+	public void setBoundary_repel_factor(float boundary_repel_factor)
+	{
+		this.boundaryRepelFactor = boundary_repel_factor;
 	}
 
 	public void setData_file_path(String data_file_path)
@@ -100,9 +126,19 @@ public class AIConfig
 		this.lowFuelThreshold = low_fuel_threshold;
 	}
 
+	public void setObstacle_repel_factor(float obstacle_repel_factor)
+	{
+		this.obstacleRepelFactor = obstacle_repel_factor;
+	}
+
 	public void setOverride_file_path(String override_file_path)
 	{
 		this.overrideFilePath = override_file_path;
+	}
+
+	public void setPlane_repel_factor(float plane_repel_factor)
+	{
+		this.planeRepelFactor = plane_repel_factor;
 	}
 
 	public void setRepulsion_strength_factor(float repulsion_strength_factor)
