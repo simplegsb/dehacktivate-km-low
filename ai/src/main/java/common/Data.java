@@ -24,6 +24,8 @@ public class Data
 
 	public Rectangle boundary;
 
+	public Vectorf2 center;
+
 	public List<Obstacle> obstacles;
 
 	public List<Plane> planes;

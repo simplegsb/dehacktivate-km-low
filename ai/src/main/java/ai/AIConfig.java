@@ -23,13 +23,15 @@ public class AIConfig
 
 	public String dataFilePath;
 
+	public float destinationThreshold;
+
+	public float escapeTime;
+
 	public String flightPathFilePath;
 
 	public int frameRateCap;
 
 	public String instructionsFilePath;
-
-	public float lowFuelThreshold;
 
 	public float obstacleRepelFactor;
 
@@ -51,6 +53,16 @@ public class AIConfig
 		return dataFilePath;
 	}
 
+	public float getDestination_threshold()
+	{
+		return destinationThreshold;
+	}
+
+	public float getEscape_time()
+	{
+		return escapeTime;
+	}
+
 	public String getFlight_path_file_path()
 	{
 		return flightPathFilePath;
@@ -64,11 +76,6 @@ public class AIConfig
 	public String getInstructions_file_path()
 	{
 		return instructionsFilePath;
-	}
-
-	public float getLow_fuel_threshold()
-	{
-		return lowFuelThreshold;
 	}
 
 	public float getObstacle_repel_factor()
@@ -106,6 +113,16 @@ public class AIConfig
 		this.dataFilePath = data_file_path;
 	}
 
+	public void setDestination_threshold(float destination_threshold)
+	{
+		this.destinationThreshold = destination_threshold;
+	}
+
+	public void setEscape_time(float escape_time)
+	{
+		this.escapeTime = escape_time;
+	}
+
 	public void setFlight_path_file_path(String flight_path_file_path)
 	{
 		this.flightPathFilePath = flight_path_file_path;
@@ -119,11 +136,6 @@ public class AIConfig
 	public void setInstructions_file_path(String instructions_file_path)
 	{
 		this.instructionsFilePath = instructions_file_path;
-	}
-
-	public void setLow_fuel_threshold(float low_fuel_threshold)
-	{
-		this.lowFuelThreshold = low_fuel_threshold;
 	}
 
 	public void setObstacle_repel_factor(float obstacle_repel_factor)

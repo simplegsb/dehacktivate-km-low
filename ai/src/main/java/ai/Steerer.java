@@ -22,24 +22,27 @@ public class Steerer
 		Vectorf2 cumulativeRepulsionEffect = new Vectorf2();
 		List<MileHighObject> objects = Data.getInstance().getObjects();
 
-		// Repel the edges of the map too, lets not give away points we don't need to!
-		// Although... better to lose a plane than have a crash so lets make these less influential.
-		Obstacle topBoundary = new Obstacle();
-		topBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.min.y);
-		topBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
-		objects.add(topBoundary);
-		Obstacle leftBoundary = new Obstacle();
-		leftBoundary.position = new Vectorf2(Data.getInstance().boundary.min.x, plane.position.y);
-		leftBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
-		objects.add(leftBoundary);
-		Obstacle bottomBoundary = new Obstacle();
-		bottomBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.max.y);
-		bottomBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
-		objects.add(bottomBoundary);
-		Obstacle rightBoundary = new Obstacle();
-		rightBoundary.position = new Vectorf2(Data.getInstance().boundary.max.x, plane.position.y);
-		rightBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
-		objects.add(rightBoundary);
+		if (!AI.isFuelLow(plane))
+		{
+			// Repel the edges of the map too, lets not give away points we don't need to!
+			// Although... better to lose a plane than have a crash so lets make these less influential.
+			Obstacle topBoundary = new Obstacle();
+			topBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.min.y);
+			topBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			objects.add(topBoundary);
+			Obstacle leftBoundary = new Obstacle();
+			leftBoundary.position = new Vectorf2(Data.getInstance().boundary.min.x, plane.position.y);
+			leftBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			objects.add(leftBoundary);
+			Obstacle bottomBoundary = new Obstacle();
+			bottomBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.max.y);
+			bottomBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			objects.add(bottomBoundary);
+			Obstacle rightBoundary = new Obstacle();
+			rightBoundary.position = new Vectorf2(Data.getInstance().boundary.max.x, plane.position.y);
+			rightBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			objects.add(rightBoundary);
+		}
 
 		for (MileHighObject object : objects)
 		{

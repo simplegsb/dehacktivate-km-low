@@ -11,6 +11,7 @@ import common.Instructions;
 import common.JSON;
 import common.Obstacle;
 import common.Plane;
+import common.Rectangle;
 import common.Timer;
 import common.Vectorf2;
 
@@ -28,6 +29,11 @@ public class AI
 
 	private static void calculateData()
 	{
+		Rectangle boundary = Data.getInstance().boundary;
+		Data.getInstance().center =
+				new Vectorf2((boundary.max.x - boundary.min.x) / 2.0f + boundary.min.x,
+						(boundary.max.y - boundary.min.y) / 2.0f + boundary.min.y);
+
 		for (Obstacle obstacle : Data.getInstance().obstacles)
 		{
 			obstacle.collisionRadius =
@@ -56,6 +62,42 @@ public class AI
 		}
 	}
 
+	public static Vectorf2 getEscapeVector(Plane plane)
+	{
+		Vectorf2 fromCenterToPosition = Vectorf2.subtract(plane.position, Data.getInstance().center);
+
+		Vectorf2 escapeVector = fromCenterToPosition.copy();
+
+		if (Math.abs(escapeVector.x) > Math.abs(escapeVector.y))
+		{
+			escapeVector.divide(Math.abs(escapeVector.x));
+			float boundaryRangeX = Data.getInstance().boundary.max.x - Data.getInstance().boundary.min.x;
+			escapeVector.multiply(boundaryRangeX / 2.0f);
+		}
+		else
+		{
+			escapeVector.divide(Math.abs(escapeVector.y));
+			float boundaryRangeY = Data.getInstance().boundary.max.y - Data.getInstance().boundary.min.y;
+			escapeVector.multiply(boundaryRangeY / 2.0f);
+		}
+
+		escapeVector.subtract(fromCenterToPosition);
+
+		return escapeVector;
+	}
+
+	public static boolean isFuelLow(Plane plane)
+	{
+		if (fuelUsageRates.get(plane) == null || fuelUsageRates.get(plane) == 0.0f)
+		{
+			return false;
+		}
+
+		float escapeTime = getEscapeVector(plane).getMagnitude() / plane.speed * AIConfig.getInstance().escapeTime;
+
+		return plane.fuel / fuelUsageRates.get(plane) <= escapeTime;
+	}
+
 	public static void main(String[] args)
 	{
 		AI ai = new AI();
@@ -79,6 +121,12 @@ public class AI
 			if (new File(AIConfig.getInstance().dataFilePath).exists())
 			{
 				Data.setInstance(JSON.fromDataFile(AIConfig.getInstance().dataFilePath, 2048));
+				// If we couldn't manage to read the data file.
+				if (Data.getInstance().boundary == null)
+				{
+					continue;
+				}
+
 				// Calculate some extra data based on what is given...
 				calculateData();
 			}
@@ -140,7 +188,7 @@ public class AI
 		}
 
 		List<Node> path = flightPath.subList(flightPath.indexOf(closestNode), flightPath.size());
-		PathFollower pathFollower = new PathFollower(path, plane.speed, 100.0f);
+		PathFollower pathFollower = new PathFollower(path, plane.speed, AIConfig.getInstance().destinationThreshold);
 		pathFollowers.put(plane, pathFollower);
 	}
 
@@ -150,7 +198,7 @@ public class AI
 		{
 			if (previousFuel.get(plane) != null)
 			{
-				fuelUsageRates.put(plane, (plane.fuel - previousFuel.get(plane)) * deltaTime);
+				fuelUsageRates.put(plane, (previousFuel.get(plane) - plane.fuel) / deltaTime);
 			}
 			previousFuel.put(plane, plane.fuel);
 
@@ -171,31 +219,19 @@ public class AI
 
 			if (plane.destination == null)
 			{
-				/*if (isFuelLow(plane))
+				if (isFuelLow(plane))
 				{
-					Vectorf2 awayFromRunway = Vectorf2.subtract(plane.position, Data.getInstance().runway);
-					awayFromRunway.normalize();
-					awayFromRunway.multiply(1000000.0f); // Times ONE MILLION! Get out of here!
-					plane.destination = Vectorf2.add(plane.position, awayFromRunway);
+					plane.destination = Vectorf2.add(plane.position, getEscapeVector(plane));
 				}
 				else
-				{*/
+				{
+					// The runway is the default destination but the path follower may override this.
 					plane.destination = Data.getInstance().runway;
 					pathFollowers.get(plane).follow(plane);
-				//}
+				}
 			}
 
 			new Steerer(plane).steer(deltaTime);
 		}
-	}
-
-	private boolean isFuelLow(Plane plane)
-	{
-		if (fuelUsageRates.get(plane) == null)
-		{
-			return false;
-		}
-
-		return fuelUsageRates.get(plane) * plane.fuel <= AIConfig.getInstance().lowFuelThreshold;
 	}
 }

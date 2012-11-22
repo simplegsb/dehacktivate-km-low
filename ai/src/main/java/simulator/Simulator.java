@@ -147,6 +147,7 @@ public class Simulator
 			plane.heading.rotate(turnAngle);
 			plane.rotation = plane.heading.getRotation();
 
+			plane.fuel -= 0.5f * deltaTime;
 			plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
 
 			for (Plane otherPlane : Data.getInstance().planes)
@@ -177,7 +178,15 @@ public class Simulator
 					plane.position.y > SimulatorConfig.getInstance().boundary.max.y)
 			{
 				iterator.remove();
-				System.out.println("Plane " + plane.id + " has left the building (" + plane.position + ").");
+				System.out.println("Plane " + plane.id + " has left the building (" + plane.position + ", fuel: " + plane.fuel + ").");
+				continue;
+			}
+
+			if (plane.fuel <= 0.0f)
+			{
+				iterator.remove();
+				System.out.println("Plane " + plane.id + " ran out of fuel (" + plane.position + ").");
+				continue;
 			}
 
 			if (Math.abs(plane.position.x - SimulatorConfig.getInstance().runway.x) <
@@ -187,6 +196,7 @@ public class Simulator
 			{
 				iterator.remove();
 				System.out.println("Plane " + plane.id + " has landed!");
+				continue;
 			}
 		}
 
@@ -220,6 +230,7 @@ public class Simulator
 
 		plane.collisionRadius = SimulatorConfig.getInstance().collisionRadius;
 		plane.currentWaypointIndex = 0;
+		plane.fuel = 100.0f;
 		plane.heading = new Vectorf2();
 		plane.id = planeId++;
 		plane.position = new Vectorf2();

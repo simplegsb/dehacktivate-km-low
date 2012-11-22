@@ -1,10 +1,11 @@
 {
 	"boundary_repel_factor":0.5,
 	"data_file_path":"data.json",
+	"destination_threshold":100.0,
+	"escape_time":2.0,
 	"flight_path_file_path":"flight-path.json",
 	"frame_rate_cap":10,
 	"instructions_file_path":"instructions.json",
-	"low_fuel_threshold":5.0,
 	"obstacle_repel_factor":1.0,
 	"override_file_path":"override.json",
 	"plane_repel_factor":1.0,
