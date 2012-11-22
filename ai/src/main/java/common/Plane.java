@@ -96,9 +96,8 @@ public class Plane extends MileHighObject
 	public float getRotation()
 	{
 		// Rotate to get INTO the silly coordinate system where positive y (down) is 0 degrees.
-		// Also adjust because our rotations are in the opposite direction.
 		// This is only used by the simulator when it creates data.json.
-		return (float) Math.toDegrees(rotation * -1.0f + Math.PI);
+		return (float) Math.toDegrees(rotation + Math.PI);
 	}
 
 	public float getSpeed()

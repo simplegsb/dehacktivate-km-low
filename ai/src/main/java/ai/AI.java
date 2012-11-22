@@ -44,8 +44,7 @@ public class AI
 		for (Plane plane : Data.getInstance().planes)
 		{
 			// Rotate 180 degrees to get out of the silly coordinate system where positive y (down) is 0 degrees.
-			// Also adjust because our rotations are in the opposite direction.
-			plane.rotation = (float) Math.toRadians(plane.rotation * -1.0f + 180.0f);
+			plane.rotation = (float) Math.toRadians(plane.rotation + 180.0f);
 			plane.heading = new Vectorf2();
 			plane.heading.toUnitRotation(plane.rotation);
 			plane.turnSpeed = (float) Math.toRadians(plane.turnSpeed);
