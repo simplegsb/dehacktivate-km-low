@@ -2,7 +2,7 @@
 	"boundary_repel_factor":2.0,
 	"data_file_path":"C:\\MileHigh\\io\\upload\\data.json",
 	"destination_threshold":100.0,
-	"escape_time":2.5,
+	"escape_time":2.0,
 	"flight_path_file_path":"flight-path.json",
 	"frame_rate_cap":5,
 	"fuel_consumption_rate":1.0,

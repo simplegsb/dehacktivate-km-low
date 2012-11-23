@@ -68,6 +68,11 @@ public class AI
 		}
 	}
 
+	public static float getAge(Plane plane)
+	{
+		return planeAges.get(plane);
+	}
+
 	public static Vectorf2 getEscapeVector(Plane plane)
 	{
 		Vectorf2 fromCenterToPosition = Vectorf2.subtract(plane.position, Data.getInstance().center);
@@ -186,8 +191,6 @@ public class AI
 		JSON.toArrayFile(Instructions.getInstance(), AIConfig.getInstance().instructionsFilePath);
 	}
 
-	private List<Plane> holdingPoints;
-
 	private Map<Plane, PathFollower> pathFollowers;
 
 	public AI()
@@ -216,11 +219,9 @@ public class AI
 
 	public void advance(float deltaTime)
 	{
-		
-
 		for (Plane plane : Data.getInstance().planes)
 		{
-			/*if (previousFuel.get(plane) != null)
+			if (previousFuel.get(plane) != null)
 			{
 				fuelUsageRates.put(plane, (previousFuel.get(plane) - plane.fuel) / deltaTime);
 			}
@@ -229,7 +230,7 @@ public class AI
 			{
 				planeAges.put(plane, 0.0f);
 			}
-			planeAges.put(plane, planeAges.get(plane) + deltaTime);*/
+			planeAges.put(plane, planeAges.get(plane) + deltaTime);
 
 			if (pathFollowers.get(plane) == null)
 			{
@@ -242,21 +243,25 @@ public class AI
 				if (instruction.planeId == plane.id)
 				{
 					plane.destination = instruction.waypoints.get(0);
+					if (plane.destination.equals(new Vectorf2(0.0f, 0.0f)))
+					{
+						escapingPlanes.add(plane);
+					}
 					break;
 				}
 			}
 
 			if (plane.destination == null)
 			{
-				/*if (escapingPlanes.contains(plane) || isFuelLow(plane))
+				if (escapingPlanes.contains(plane) || (getAge(plane) < 1.0f && isFuelLow(plane)))
 				{
 					plane.destination = Vectorf2.add(plane.position, getEscapeVector(plane));
 				}
-				else*/
+				else
 				{
 					// The runway is the default destination but the path follower may override this.
 					plane.destination = Data.getInstance().runway;
-					//pathFollowers.get(plane).follow(plane);
+					pathFollowers.get(plane).follow(plane);
 				}
 			}
 

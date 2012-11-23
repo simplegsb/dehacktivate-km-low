@@ -28,19 +28,19 @@ public class Steerer
 			// Although... better to lose a plane than have a crash so lets make these less influential.
 			/*Obstacle topBoundary = new Obstacle();
 			topBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.min.y);
-			topBoundary.collisionRadius = 400.0f;//plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			topBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 			objects.add(topBoundary);
 			Obstacle leftBoundary = new Obstacle();
 			leftBoundary.position = new Vectorf2(Data.getInstance().boundary.min.x, plane.position.y);
-			leftBoundary.collisionRadius = 500.0f;//plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			leftBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 			objects.add(leftBoundary);
 			Obstacle bottomBoundary = new Obstacle();
 			bottomBoundary.position = new Vectorf2(plane.position.x, Data.getInstance().boundary.max.y);
-			bottomBoundary.collisionRadius = 600.0f;//plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			bottomBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 			objects.add(bottomBoundary);
 			Obstacle rightBoundary = new Obstacle();
 			rightBoundary.position = new Vectorf2(Data.getInstance().boundary.max.x, plane.position.y);
-			rightBoundary.collisionRadius = 500.0f;//plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
+			rightBoundary.collisionRadius = plane.speed / plane.turnSpeed * AIConfig.getInstance().boundaryRepelFactor;
 			objects.add(rightBoundary);*/
 		}
 
@@ -92,10 +92,12 @@ public class Steerer
 
 	public void steer(float deltaTime)
 	{
-		/*for (Plane otherPlane : Data.getInstance().planes)
+		for (Plane otherPlane : Data.getInstance().planes)
 		{
+			//AI.getAge(otherPlane) > AI.getAge(plane)
 			if (otherPlane != plane &&
-					Vectorf2.subtract(otherPlane.getPosition(), plane.getPosition()).getMagnitude() <= 100.0f)
+					(otherPlane.speed < plane.speed || (otherPlane.speed == plane.speed && otherPlane.id > plane.id)) &&
+					Vectorf2.subtract(otherPlane.getPosition(), plane.getPosition()).getMagnitude() <= 200.0f)
 			{
 				Vectorf2 toDestination = Vectorf2.subtract(plane.destination, plane.position);
 				float angleToDestination = plane.heading.angleTo(toDestination);
@@ -130,7 +132,7 @@ public class Steerer
 				plane.waypoints.add(Vectorf2.add(plane.position, toWaypoint));
 				return;
 			}
-		}*/
+		}
 
 		//plane.waypoints.add(Vectorf2.add(plane.position, toWaypoint));
 		plane.waypoints.add(plane.destination);

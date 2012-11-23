@@ -148,6 +148,10 @@ public class Plane extends MileHighObject
 		this.id = id;
 	}
 
+	public void setLanding(boolean landing)
+	{
+	}
+
 	public void setName(String name)
 	{
 		this.name = name;
