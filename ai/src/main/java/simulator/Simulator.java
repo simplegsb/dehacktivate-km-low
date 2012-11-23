@@ -37,10 +37,10 @@ public class Simulator
 			}*/
 			// End Debugging.
 
-			File instructionsFile = new File("instructions.json");
+			File instructionsFile = new File(SimulatorConfig.getInstance().instructionsFilePath);
 			if (instructionsFile.exists())
 			{
-				Instructions.setInstance(JSON.fromInstructionFile("instructions.json", 1024));
+				Instructions.setInstance(JSON.fromInstructionFile(SimulatorConfig.getInstance().instructionsFilePath, 1024));
 				//instructionsFile.delete();
 			}
 			updateWaypoints();
@@ -59,7 +59,7 @@ public class Simulator
 
 			simulator.advance(timer.getDeltaTime());
 
-			JSON.toObjectFile(Data.getInstance(), "data.json");
+			JSON.toObjectFile(Data.getInstance(), SimulatorConfig.getInstance().dataFilePath);
 
 			if (SimulatorConfig.getInstance().frameRateCap != 0)
 			{

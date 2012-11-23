@@ -31,6 +31,8 @@ public class AIConfig
 
 	public int frameRateCap;
 
+	public float fuelConsumptionRate;
+
 	public String instructionsFilePath;
 
 	public float obstacleRepelFactor;
@@ -71,6 +73,11 @@ public class AIConfig
 	public int getFrame_rate_cap()
 	{
 		return frameRateCap;
+	}
+
+	public float getFuel_consumption_rate()
+	{
+		return fuelConsumptionRate;
 	}
 
 	public String getInstructions_file_path()
@@ -131,6 +138,11 @@ public class AIConfig
 	public void setFrame_rate_cap(int frame_rate_cap)
 	{
 		this.frameRateCap = frame_rate_cap;
+	}
+
+	public void setFuel_consumption_rate(float fuel_consumption_rate)
+	{
+		this.fuelConsumptionRate = fuel_consumption_rate;
 	}
 
 	public void setInstructions_file_path(String instructions_file_path)

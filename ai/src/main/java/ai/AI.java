@@ -1,6 +1,7 @@
 package ai;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +18,19 @@ import common.Vectorf2;
 
 public class AI
 {
+	private static List<Plane> escapingPlanes;
+
 	private static Map<Plane, Float> fuelUsageRates;
+
+	private static Map<Plane, Float> planeAges;
 
 	private static Map<Plane, Float> previousFuel;
 
 	static
 	{
+		escapingPlanes = new ArrayList<Plane>();
 		fuelUsageRates = new HashMap<Plane, Float>();
+		planeAges = new HashMap<Plane, Float>();
 		previousFuel = new HashMap<Plane, Float>();
 	}
 
@@ -85,16 +92,37 @@ public class AI
 		return escapeVector;
 	}
 
+	public static float getFuelUsageRate(Plane plane)
+	{
+		if (AIConfig.getInstance().fuelConsumptionRate != 0.0f)
+		{
+			return AIConfig.getInstance().fuelConsumptionRate;
+		}
+
+		if (fuelUsageRates.get(plane) != null && fuelUsageRates.get(plane) != 0.0f)
+		{
+			return fuelUsageRates.get(plane);
+		}
+
+		return 0.0f;
+	}
+
 	public static boolean isFuelLow(Plane plane)
 	{
-		if (fuelUsageRates.get(plane) == null || fuelUsageRates.get(plane) == 0.0f)
+		if (getFuelUsageRate(plane) == 0.0f)
 		{
 			return false;
 		}
 
 		float escapeTime = getEscapeVector(plane).getMagnitude() / plane.speed * AIConfig.getInstance().escapeTime;
 
-		return plane.fuel / fuelUsageRates.get(plane) <= escapeTime;
+		if (plane.fuel / getFuelUsageRate(plane) <= escapeTime)
+		{
+			escapingPlanes.add(plane);
+			return true;
+		}
+
+		return false;
 	}
 
 	public static void main(String[] args)
@@ -113,7 +141,7 @@ public class AI
 			if (configDelta >= 1.0f)
 			{
 				AIConfig.setInstance(JSON.fromObjectFile(AIConfig.class, "ai-config.json", 256));
-				FlightPath.setInstance(JSON.fromFlightPathFile(AIConfig.getInstance().flightPathFilePath, 256));
+				FlightPath.setInstance(JSON.fromFlightPathFile(AIConfig.getInstance().flightPathFilePath, 512));
 				configDelta = 0.0f;
 			}
 
@@ -130,14 +158,7 @@ public class AI
 				calculateData();
 			}
 
-			if (new File(AIConfig.getInstance().overrideFilePath).exists())
-			{
-				Instructions.setInstance(JSON.fromInstructionFile(AIConfig.getInstance().overrideFilePath, 1024));
-			}
-			else
-			{
-				Instructions.getInstance().clear();
-			}
+			Instructions.setInstance(JSON.fromInstructionUrl("http://192.168.21.206/ui/override.json", 1024));
 
 			ai.advance(timer.getDeltaTime());
 
@@ -164,6 +185,8 @@ public class AI
 
 		JSON.toArrayFile(Instructions.getInstance(), AIConfig.getInstance().instructionsFilePath);
 	}
+
+	private List<Plane> holdingPoints;
 
 	private Map<Plane, PathFollower> pathFollowers;
 
@@ -193,13 +216,20 @@ public class AI
 
 	public void advance(float deltaTime)
 	{
+		
+
 		for (Plane plane : Data.getInstance().planes)
 		{
-			if (previousFuel.get(plane) != null)
+			/*if (previousFuel.get(plane) != null)
 			{
 				fuelUsageRates.put(plane, (previousFuel.get(plane) - plane.fuel) / deltaTime);
 			}
 			previousFuel.put(plane, plane.fuel);
+			if (planeAges.get(plane) == null)
+			{
+				planeAges.put(plane, 0.0f);
+			}
+			planeAges.put(plane, planeAges.get(plane) + deltaTime);*/
 
 			if (pathFollowers.get(plane) == null)
 			{
@@ -218,19 +248,21 @@ public class AI
 
 			if (plane.destination == null)
 			{
-				if (isFuelLow(plane))
+				/*if (escapingPlanes.contains(plane) || isFuelLow(plane))
 				{
 					plane.destination = Vectorf2.add(plane.position, getEscapeVector(plane));
 				}
-				else
+				else*/
 				{
 					// The runway is the default destination but the path follower may override this.
 					plane.destination = Data.getInstance().runway;
-					pathFollowers.get(plane).follow(plane);
+					//pathFollowers.get(plane).follow(plane);
 				}
 			}
 
 			new Steerer(plane).steer(deltaTime);
+
+			System.out.println("plane " + plane.id + " pos: " + plane.position + " head: " + plane.heading + " way: " + plane.waypoints.get(0) + " dest:" + plane.destination);
 		}
 	}
 }

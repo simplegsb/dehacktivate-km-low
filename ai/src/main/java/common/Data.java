@@ -62,6 +62,10 @@ public class Data
 		this.boundary = boundary;
 	}
 
+	public void setDirections(List<Instruction> instructions)
+	{
+	}
+
 	@JSONIgnore
 	public void setObjects(List<MileHighObject> objects)
 	{

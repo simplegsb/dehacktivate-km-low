@@ -3,6 +3,8 @@ package common;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +54,7 @@ public class JSON
 		catch (Exception e)
 		{
 			// Swallowing this exception... sorry.
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		return null;
@@ -95,7 +97,50 @@ public class JSON
 		catch (Exception e)
 		{
 			// Swallowing this exception... sorry.
-			//e.printStackTrace();
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static Collection<Instruction> fromInstructionUrl(String url, int initialCapacity)
+	{
+		try
+		{
+			BufferedReader file = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+			StringBuffer buffer = new StringBuffer(initialCapacity);
+
+			while (file.ready())
+			{
+				buffer.append(file.readLine());
+			}
+			file.close();
+
+			JSONArray instructionsJson = JSONArray.fromObject(buffer.toString(), CONFIG);
+			Collection<Instruction> instructions = new ArrayList<Instruction>();
+
+			for (int instructionIndex = 0; instructionIndex < instructionsJson.size(); instructionIndex++)
+			{
+				JSONObject instructionJson = instructionsJson.getJSONObject(instructionIndex);
+				Instruction instruction = new Instruction();
+				instruction.planeId = instructionJson.getInt("plane_id");
+
+				JSONArray waypoints = instructionJson.getJSONArray("waypoints");
+				for (int waypointIndex = 0; waypointIndex < waypoints.size(); waypointIndex++)
+				{
+					JSONObject waypoint = waypoints.getJSONObject(waypointIndex);
+					instruction.waypoints.add((Vectorf2) JSONObject.toBean(waypoint, Vectorf2.class));
+				}
+
+				instructions.add(instruction);
+			}
+
+			return instructions;
+		}
+		catch (Exception e)
+		{
+			// Swallowing this exception... sorry.
+			e.printStackTrace();
 		}
 
 		return null;
@@ -137,7 +182,7 @@ public class JSON
 		catch (Exception e)
 		{
 			// Swallowing this exception... sorry.
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		return null;
@@ -165,7 +210,7 @@ public class JSON
 		catch (Exception e)
 		{
 			// Swallowing this exception... sorry.
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		return null;
@@ -183,7 +228,7 @@ public class JSON
 		catch (Exception e)
 		{
 			// Swallowing this exception... sorry.
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -199,7 +244,7 @@ public class JSON
 		catch (Exception e)
 		{
 			// Swallowing this exception... sorry.
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }

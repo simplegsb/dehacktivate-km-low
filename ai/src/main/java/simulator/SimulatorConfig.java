@@ -26,7 +26,11 @@ public class SimulatorConfig
 
 	public float collisionRadius;
 
+	public String dataFilePath;
+
 	public int frameRateCap;
+
+	public String instructionsFilePath;
 
 	public Vectorf2 runway;
 
@@ -48,9 +52,19 @@ public class SimulatorConfig
 		return collisionRadius;
 	}
 
+	public String getData_file_path()
+	{
+		return dataFilePath;
+	}
+
 	public int getFrame_rate_cap()
 	{
 		return frameRateCap;
+	}
+
+	public String getInstructions_file_path()
+	{
+		return instructionsFilePath;
 	}
 
 	public Vectorf2 getRunway()
@@ -88,9 +102,19 @@ public class SimulatorConfig
 		this.collisionRadius = collisionRadius;
 	}
 
+	public void setData_file_path(String data_file_path)
+	{
+		this.dataFilePath = data_file_path;
+	}
+
 	public void setFrame_rate_cap(int frame_rate_cap)
 	{
 		this.frameRateCap = frame_rate_cap;
+	}
+
+	public void setInstructions_file_path(String instructions_file_path)
+	{
+		this.instructionsFilePath = instructions_file_path;
 	}
 
 	public void setRunway(Vectorf2 runway)

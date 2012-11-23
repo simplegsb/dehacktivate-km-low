@@ -121,6 +121,10 @@ public class Plane extends MileHighObject
 		return waypoints;
 	}
 
+	public void setCrashing(boolean crashing)
+	{
+	}
+
 	public void setCurrent_waypoint_index(int current_waypoint_index)
 	{
 		this.currentWaypointIndex = current_waypoint_index;
@@ -129,6 +133,14 @@ public class Plane extends MileHighObject
 	public void setFuel(float fuel)
 	{
 		this.fuel = fuel;
+	}
+
+	public void setGraphic(String graphic)
+	{
+	}
+
+	public void setGraphic_full_path(String graphic_full_path)
+	{
 	}
 
 	public void setId(int id)
