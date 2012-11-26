@@ -34,6 +34,35 @@ public class Plane extends MileHighObject
 		waypoints = new ArrayList<Vectorf2>();
 	}
 
+	@Override
+	public boolean equals(Object object)
+	{
+		if (object == this)
+		{
+			return true;
+		}
+
+		if (!(object instanceof Plane))
+		{
+			return false;
+		}
+
+		if (((Plane) object).id == id)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 7;
+		hash = 31 * hash + id;
+		return hash;
+	}
+
 	public int getCurrent_waypoint_index()
 	{
 		return currentWaypointIndex;
@@ -67,9 +96,8 @@ public class Plane extends MileHighObject
 	public float getRotation()
 	{
 		// Rotate to get INTO the silly coordinate system where positive y (down) is 0 degrees.
-		// Also adjust because our rotations are in the opposite direction.
 		// This is only used by the simulator when it creates data.json.
-		return (float) Math.toDegrees(rotation * -1.0f + Math.PI);
+		return (float) Math.toDegrees(rotation + Math.PI);
 	}
 
 	public float getSpeed()
@@ -93,6 +121,10 @@ public class Plane extends MileHighObject
 		return waypoints;
 	}
 
+	public void setCrashing(boolean crashing)
+	{
+	}
+
 	public void setCurrent_waypoint_index(int current_waypoint_index)
 	{
 		this.currentWaypointIndex = current_waypoint_index;
@@ -103,9 +135,21 @@ public class Plane extends MileHighObject
 		this.fuel = fuel;
 	}
 
+	public void setGraphic(String graphic)
+	{
+	}
+
+	public void setGraphic_full_path(String graphic_full_path)
+	{
+	}
+
 	public void setId(int id)
 	{
 		this.id = id;
+	}
+
+	public void setLanding(boolean landing)
+	{
 	}
 
 	public void setName(String name)

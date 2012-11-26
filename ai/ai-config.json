@@ -1,5 +1,15 @@
 {
-	"frame_rate_cap":10,
+	"boundary_repel_factor":2.0,
+	"data_file_path":"C:\\MileHigh\\io\\upload\\data.json",
+	"destination_threshold":100.0,
+	"escape_time":2.0,
+	"flight_path_file_path":"flight-path.json",
+	"frame_rate_cap":5,
+	"fuel_consumption_rate":1.0,
+	"instructions_file_path":"C:\\MileHigh\\io\\instructions.json",
+	"obstacle_repel_factor":1.0,
+	"override_file_path":"http://192.168.21.206/ui/override.json",
+	"plane_repel_factor":1.0,
 	"repulsion_strength_factor":2.0,
-	"waypoint_lead_time":1.0
+	"waypoint_lead_time":4.0
 }

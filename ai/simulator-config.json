@@ -4,8 +4,13 @@
 		"min":{"x":50,"y":50},
 		"max":{"x":1050,"y":1050}
 	},
-	"frame_rate_cap":10,
+	"collision_radius":20.0,
+	"data_file_path":"C:\\MileHigh\\io\\upload\\data.json",
+	"frame_rate_cap":5,
+	"instructions_file_path":"C:\\MileHigh\\io\\instructions.json",
 	"runway":{"x":550,"y":550},
-	"spawn_frequency":20.0,
-	"waypoint_reached_threshold":10.0
+	"spawn_frequency":3.0,
+	"speed":50.0,
+	"turn_speed":20.0,
+	"waypoint_reached_threshold":5.0
 }

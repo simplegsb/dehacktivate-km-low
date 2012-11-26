@@ -3,118 +3,516 @@
     <title>Simulator</title>
 </head>
 <style>
+    *{box-sizing: border-box;}
     #container{
-        width: 1000px;
-        height: 1000px;
+        width: 500px;
+        height: 500px;
         background: #ccc;
         position: relative;
+		float: left;
     }
 
     .plane{
-        width: 8px;
-        height: 8px;
-        margin-left: -4px;
-        margin-top: -4px;
-        background: #f00;
         position: absolute;
+		cursor: pointer;
+    }
+    .plane div:first-child{
+        width: 100%;
+        height: 100%;
+        background: url(simulation-images/plane.png) no-repeat;
+        background-size: 100% 100%;
+    }
+    .plane .fuel-gauge{
+	    position: absolute;
+	    right: -3px;
+	    bottom: 0;
+	    width: 3px;
+	    background: green;
+        height: 100%;
+    }
+    body,html{margin:0;}
+	.wrap{
+		height: 500px;
+		position: relative;
+		margin: 0;
+	}
+	#plane-list{
+		float: left;
+		width: 126px;
+	}
+    #runway{
+        position: absolute;
+        background: black;
+        width: 10px;
+        height: 10px;
+        margin-left: -5px;
+        margin-top: -5px;
+    }
+	#plane-list .plane-icon{
+		width: 50px;
+		height: 50px;
+		position: relative;
+		margin-bottom: 28px;
+		margin-left: 13px;
+		float: left;
+		cursor: pointer;
+        background: url(simulation-images/plane.png) no-repeat;
+        background-size: 100% 100%;
+	}
+	.plane-icon .fuel-gauge{
+		position: absolute;
+		right: 0;
+		bottom: 0;
+        height: 100%;
+		width: 5px;
+		background: green;
+	}
+	.plane-details{
+		background: black;
+		padding: 2px;
+		position: absolute;
+		bottom: -50px;
+		font-size: 9px;
+		color: white;
+		left: 0;
+        min-width: 60px;
+        min-height: 50px;
+	}
+	.plane-details .points{color: green;}
+	.plane-details .penalty{color: red;}
+	#hud{
+		clear: both;
+		position: relative;
+	}
+    .transition-rotate{
+        -webkit-transition: transform 250ms linear;
+        -moz-transition: transform 250ms linear;
+        -ms-transition: transform 250ms linear;
+        -o-transition: transform 250ms linear;
+        transition: transform 250ms linear;
+    }
+    .plane.selected{
+        border: 1px solid orange;
+    }
+    .waypoint{
+        width: 6px;
+        height: 6px;
+        background: orange;
+        position: absolute;
+        margin-left: -3px;
+        margin-top: -3px;
     }
 </style>
 <body>
+<div class="wrap">
+	<div id="container">
 
-<div id="container">
-
+	</div>
+	<div id="plane-list">
+	
+	</div>
+</div>
+<div id="hud" style="display:none;">
+	
 </div>
 
 <script src="jquery-1.8.2.min.js"></script>
 
 <script type="text/javascript">
+    Array.prototype.clean = function(deleteValue) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] == deleteValue) {
+                this.splice(i, 1);
+                i--;
+            }
+        }
+        return this;
+    };
+
     var planes = [],
-            opts = {
-                boundary : {
-                    max : {x:1000, y:1000},
-                    min : {x:0, y: 0}
-                },
-                runway : {
-                    x : 500,
-                    y: 550
-                }
+		tempPlanes= [],
+        waypoints = [],
+        opts = {
+            boundary : {
+                max : {x:1000, y:1000},
+                min : {x:0, y: 0}
             },
-            $container = $("#container");
+            runway : {
+                x : 500,
+                y: 550
+            }
+        },
+        $container = $("#container"),
+		$planeList = $('#plane-list'),
+            $hud = $('#hud'),
+		maxFuel = 100,
+		hasSetOptions = false,
+		iterations = 0;
+
+
+    $container.on('click', '.plane', function(e){
+        $('.selected').removeClass('selected');
+
+        var $this = $(this);
+        $this.addClass('selected');
+        showHUD($this);
+    }).on('contextmenu', function(e){
+                e.preventDefault();
+                if($(e.target).is('.waypoint')){
+                    removeWaypoint($(e.target));
+                }
+    }).on('dblclick', function(e){
+                console.log('dblclick');
+        if($('.selected').length){
+            addWaypoint($('.selected'), e);
+        }
+    }).on('contextmenu', '.plane', function(e){
+               var id = $(this).data('id');
+                $('.waypoint[data-attachedplaneid="'+id+'""]').trigger('contextmenu');
+            });
+    $('body').on('keydown', function(e){
+        if(e.which == 27){
+            e.preventDefault();
+            $('.selected').removeClass('selected');
+        }
+        if(e.which == 90){
+            if($('.selected').length){
+                var id = $('.selected').data('id');
+                setWaypointZeroZero(id);
+            }
+        }
+    });
+
+    $planeList.on('click', '.plane-icon', function(){
+
+    });
 
 
 
-    function movePlane(data){
-        console.log('movePlane');
-        console.log(data);
+    function showHUD($obj){
+
+    }
+    function setWaypointZeroZero(id){
+        var     i,
+                isInArray = false,
+                newWaypoint = {
+                    x:0,
+                    y:0
+                };
+        // CHANGED TO ACCOMMODATE ONE WAYPOINT
+        $('.waypoint[data-attachedplaneid="'+id+'"]').remove();
+        for(i = 0, len = waypoints.length; i < len; i++){
+            if(id === waypoints[i].plane_id){
+                isInArray = true;
+                break;
+            }
+        }
+        if(isInArray){
+            waypoints[i].waypoints[0] = newWaypoint;
+
+        }else{
+         var newPlane = {
+            plane_id: id,
+            waypoints: []
+        };
+             newPlane.waypoints.push(newWaypoint);
+             waypoints.push(newPlane);
+        }
+        writeInstructions();
+    }
+    function addWaypoint($obj, e){
+        console.log('addWaypoint');
+
+        var id = $obj.data('id'),
+                i,
+                isInArray = false,
+                newWaypoint = {
+                    x:(e.pageX*2) + opts.boundary.min.x,
+                    y:(e.pageY*2) + opts.boundary.min.y
+                };
+        // CHANGED TO ACCOMMODATE ONE WAYPOINT
+        $('.waypoint[data-attachedplaneid="'+id+'"]').remove();
+        for(i = 0, len = waypoints.length; i < len; i++){
+            if(id === waypoints[i].plane_id){
+                isInArray = true;
+                break;
+            }
+        }
+        if(isInArray){
+            // CHANGED TO ACCOMMODATE ONE WAYPOINT
+            waypoints[i].waypoints[0] = newWaypoint;
+        }else{
+            var newPlane = {
+                plane_id: id,
+                waypoints: []
+            };
+            newPlane.waypoints.push(newWaypoint);
+            waypoints.push(newPlane);
+        }
+        var $newWaypoint = $(document.createElement('div'));
+        $newWaypoint.attr({
+            class: 'waypoint',
+            "data-attachedplaneid": id
+        }).data({
+            id: id,
+            waypointid: id+'-'+(new Date()).getTime()
+        }).css({
+            top:e.pageY,
+            left:e.pageX
+        });
+        $container.append($newWaypoint);
+        writeInstructions();
+    }
+    function removeWaypoint($waypoint){
+        var id = $waypoint.data('id'),
+                i, ek,9]\
+                isInArray = false,
+                isInSecondArray = false,
+                tempArray = [];
+
+        for(i = 0, len = waypoints.length; i < len; i++){
+            if(id === waypoints[i].plane_id){
+                isInArray = true;
+                break;
+            }
+        }
+        if(isInArray){
+            for(ek = 0; ek < waypoints[i].waypoints.length; ek++){
+                isInSecondArray = true;
+                break;
+            }
+            if(isInSecondArray){
+                waypoints[i].waypoints.splice(ek,1);
+                tempArray = waypoints[i].waypoints.clean(undefined);
+                waypoints[i].waypoints = tempArray;
+                if(waypoints[i].waypoints.length === 0){
+                    waypoints.splice(i,1);
+                    tempArray = waypoints.clean(undefined);
+                    waypoints = tempArray;
+                }
+            }else{
+                console.log("Couldn't find waypoint in plane waypoints array, planeid:"+id);
+            }
+        }else{
+            console.log("Couldn't find plane in waypoint array");
+        }
+
+        writeInstructions();
+    }
+    function writeInstructions(){
+        var getID = [],
+            getX = [],
+            getY = [];
+
+        for(var i = 0, len = waypoints.length; i < len; i++){
+            getID[i] = waypoints[i].plane_id;
+            getX[i] = waypoints[i].waypoints[0].x;
+            getY[i] = waypoints[i].waypoints[0].y;
+        }
+        var serverData = 'yes=0&id='+JSON.stringify(getID)+'&x='+JSON.stringify(getX)+'&y='+JSON.stringify(getY);
+        $.ajax({
+            url: 'override.php',
+            data: serverData,
+            success: function(){
+                console.log("override write successful");
+            }
+        });
+    }
+
+    function deleteInstructions(){
+        $.ajax({
+            url : 'override.php',
+            data: 'yes=0&id=[]&x=[]&y=[]',
+            success: function(){
+                console.log("deleted instructions");
+            }
+        });
+    }
+    deleteInstructions();
+
+    function updatePlane(data){
+        //console.log('updatePlane');
+        //console.log(data);
         $('#plane-'+data.id).css({
-            top: (data.position.y - opts.boundary.min.y)+'px',
-            left: (data.position.x - opts.boundary.min.x)+'px'
-        }).attr({
-                    title: 'Fuel Left: '+ data.fuel
-                });
-        console.log($('#plane-'+data.id));
+            top: (data.position.y - opts.boundary.min.y)/2+'px',
+            left: (data.position.x - opts.boundary.min.x)/2+'px'
+        })
+		.data({
+			iteration: iterations
+		})
+        .find('div').first().css({
+            transform: 'rotate('+(data.rotation)+'deg)'
+        })
+		.find('.fuel-gauge').css({
+            height: data.fuel+'%'
+        });
+		
+        //console.log($('#plane-'+data.id));
     }
 
     function createPlane(data){
-        console.log('createPlane');
+        //console.log('createPlane');
         var $newPlane = $(document.createElement('div'));
         $newPlane.attr({
             id: 'plane-'+data.id,
             class: 'plane'
-        });
+        })
+		.append('<div class="transition-rotate"></div><div class="fuel-gauge"></div><div class="plane-details"></div>');
+		$newPlane.data({
+			id: data.id,
+			fuel: data.fuel
+		})
+		.css({
+			width: data.collision_radius,
+			height: data.collision_radius,
+			marginLeft: -data.collision_radius/2,
+			marginTop: -data.collision_radius/2
+		})
+		.find('.plane-details').html(data.id+'<br /><span class="points">'+data.points+'</span> / <span class="penalty">'+data.penalty+'</span>').end()
+		.find('.fuel-gauge').css({
+			
+		});
         $container.append($newPlane);
-        movePlane(data);
+		
+		var $planeIcon = $(document.createElement('div'));
+		$planeIcon.attr({
+			class: 'plane-icon',
+			'data-id' : data.id
+		})
+		.append('<div class="fuel-gauge"></div><div class="plane-details"></div>')
+		.data({
+			id: data.id
+		})
+		.find('.plane-details').html(data.id+'<br /><span class="points">'+data.points+'</span> / <span class="penalty">'+data.penalty+'</span>');
+		$planeList.append($planeIcon);
+		
+		planes.push(data);
+        updatePlane(data);
     }
 
     function setOptions(data){
-        console.log('setOptions');
+        //console.log('setOptions');
         opts.boundary.max.y = data.boundary.max.y;
         opts.boundary.max.x = data.boundary.max.x;
         opts.boundary.min.y = data.boundary.min.y;
         opts.boundary.min.x = data.boundary.min.x;
         opts.runway.x = data.runway.x;
         opts.runway.y = data.runway.y;
+
+        var $runway = $(document.createElement('div'));
+        $runway.attr({
+            id: 'runway'
+        }).css({
+            top: (opts.runway.y - opts.boundary.min.y)/2+'px',
+            left: (opts.runway.x - opts.boundary.min.x)/2+'px'
+        });
+
+        $container.append($runway);
+		hasSetOptions = true;
     }
 
 
     function checkIfPlaneExists(id){
-        console.log('checkIfPlaneExists');
+        //console.log('checkIfPlaneExists');
         var doesExist = false;
-        for(var i = 0, len = planes.length; i < len; i++){
+        /*for(var i = 0, len = planes.length; i < len; i++){
             if(id == planes[i].id){
                 doesExist = true;
                 break;
             }
-        }
+        }*/
+
+		if($('#plane-'+id).length) doesExist = true;
+		
         return doesExist;
     }
 
+	function checkForDeadPlanes(){
+		$('.plane').each(function(){
+			if($(this).data('iteration') < iterations){
+				for(var i = 0; i < planes.length; i++){
+					if($(this).data('id') === planes[i].id){
+						planes.splice(i,1);
+					}
+				}
+                tempPlanes = planes.clean(undefined);
+                planes = tempPlanes;
+				
+				$planeList.find('[data-id="'+$(this).data('id')+'"]').remove();
+				$(this).remove();
+			}
+		});
+	}
+
+    function updateHUD(){
+        if($('.selected').length === 0){
+            $hud.hide();
+        }else{
+
+        }
+    }
+
+    function checkForWaypointsReached(){
+        if(waypoints.length === 0) return;
+
+
+    }
+
     function ajaxCallback(data){
-        console.log(data);
-        setOptions(data);
-        console.log('ajaxCallback');
+        //console.log(data);
+		if(data === null){
+			getData();
+			return;
+		}
+        if(!hasSetOptions) setOptions(data);
+        //console.log('ajaxCallback');
         for(var i = 0, len = data.objects.length; i<len; i++){
             if(checkIfPlaneExists(data.objects[i].id))
-                movePlane(data.objects[i]);
+                updatePlane(data.objects[i]);
             else
                 createPlane(data.objects[i]);
         }
+		checkForDeadPlanes();
+		iterations++;
+
+        updateHUD();
+        checkForWaypointsReached();
     }
 
     // EXAMPLE OF AN AJAX REQUEST:
     // UNCOMMENT TO ACTIVATE POLLING
 
-    setInterval(function(){
-     $.ajax({
-         url: 'data.json',
-         dataType: 'json',
-         success: ajaxCallback
-     });
-     }, 100);
+	function getData(){
+		$.ajax({
+	         url: 'getData.php',
+	         dataType: 'json',
+			 cache: false,
+	         success: ajaxCallback
+	     });
+	}
+
+    setInterval(getData, 75);
 
     // COMMENT WHEN UNCOMMENTING ABOVE
     //ajaxCallback(data);
 
+
+
+    // HELPERS
+
+    function hexFromRGBPercent(r, g, b) {
+        var hex = [
+            Math.floor(r / 100 * 255).toString( 16 ),
+            Math.floor(g / 100 * 255).toString( 16 ),
+            Math.floor(b / 100 * 255).toString( 16 )
+        ];
+        $.each( hex, function( nr, val ) {
+            if ( val.length === 1 ) {
+                hex[ nr ] = "0" + val;
+            }
+        });
+        return hex.join( "" ).toUpperCase();
+    }
 </script>
 </body>
 </html>

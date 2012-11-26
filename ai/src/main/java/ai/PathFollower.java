@@ -9,23 +9,23 @@ public class PathFollower
 {
 	private Vectorf2 destination;
 
+	private float destinationThreshold;
+
 	private boolean endReached;
 
-	private float gridSize;
+	private float advanceDistance;
 
 	private int nextWaypointIndex;
 
 	private List<Node> path;
 
-	private Plane plane;
-
 	private int previousWaypointIndex;
 
-	public PathFollower(Plane plane, List<Node> path, float gridSize)
+	public PathFollower(List<Node> path, float advanceDistance, float destinationThreshold)
 	{
-		this.gridSize = gridSize;
+		this.advanceDistance = advanceDistance;
+		this.destinationThreshold = destinationThreshold;
 		this.path = path;
-		this.plane = plane;
 
 		destination = null;
 		endReached = false;
@@ -45,17 +45,16 @@ public class PathFollower
 				path.get(previousWaypointIndex).getPosition());
 		advancement.normalize();
 		advancement.multiply(distance);
-		Vectorf2 destinationCopy = destination.copy();
-		destinationCopy.add(advancement); 
+		Vectorf2 newDestination = Vectorf2.add(destination, advancement);
 
 		float distancePastNextWaypoint =
-				Vectorf2.subtract(destinationCopy, path.get(previousWaypointIndex).getPosition()).getMagnitude() -
+				Vectorf2.subtract(newDestination, path.get(previousWaypointIndex).getPosition()).getMagnitude() -
 				Vectorf2.subtract(path.get(nextWaypointIndex).getPosition(),
 						path.get(previousWaypointIndex).getPosition()).getMagnitude();
 
 		if (distancePastNextWaypoint > 0.0f)
 		{
-			destination = path.get(nextWaypointIndex).getPosition();
+			destination = path.get(nextWaypointIndex).getPosition().copy();
 
 			if (path.size() > nextWaypointIndex + 1)
 			{
@@ -67,35 +66,34 @@ public class PathFollower
 		}
 		else
 		{
-			destination.add(advancement);
+			destination = newDestination;
 		}
 	}
 
-	public void follow()
+	public void follow(Plane plane)
 	{
-		if (path.size() <= 1 || endReached)
+		if (path.isEmpty() || endReached)
 		{
-			destination = plane.destination;
+			return;
 		}
-		else
+
+		if (Vectorf2.subtract(path.get(path.size() - 1).getPosition(),
+				plane.position).getMagnitude() <= destinationThreshold)
 		{
-			if (Vectorf2.subtract(path.get(path.size() - 1).getPosition(),
-					plane.position).getMagnitude() <= gridSize * 1.5f)
-			{
-				endReached = true;
-			}
-
-			if (previousWaypointIndex == -1)
-			{
-				destination = path.get(0).getPosition();
-			}
-
-			if (Vectorf2.subtract(destination, plane.position).getMagnitude() <= gridSize * 1.5f)
-			{
-				advanceDestinationOnPath(gridSize * 1.5f);
-			}
-
-			plane.destination = destination;
+			endReached = true;
+			return;
 		}
+
+		if (previousWaypointIndex == -1)
+		{
+			destination = path.get(0).getPosition().copy();
+		}
+
+		if (Vectorf2.subtract(destination, plane.position).getMagnitude() <= destinationThreshold)
+		{
+			advanceDestinationOnPath(advanceDistance);
+		}
+
+		plane.destination = destination;
 	}
 }

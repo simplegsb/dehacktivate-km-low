@@ -1,7 +1,9 @@
 package simulator;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import common.Data;
 import common.Instruction;
@@ -28,23 +30,23 @@ public class Simulator
 			timer.tick();
 
 			// Debugging.
-			System.out.println("Planes:");
+			/*System.out.println("Planes:");
 			for (Plane plane : Data.getInstance().planes)
 			{
 				System.out.println("\tPlane " + plane.id + " is at " + plane.position);
-			}
+			}*/
 			// End Debugging.
 
-			File instructionsFile = new File("instructions.json");
+			File instructionsFile = new File(SimulatorConfig.getInstance().instructionsFilePath);
 			if (instructionsFile.exists())
 			{
-				Instructions.setInstance(JSON.fromInstructionFile("instructions.json", 1024));
+				Instructions.setInstance(JSON.fromInstructionFile(SimulatorConfig.getInstance().instructionsFilePath, 1024));
 				//instructionsFile.delete();
 			}
 			updateWaypoints();
 
 			// Debugging.
-			System.out.println("Instructions:");
+			/*System.out.println("Instructions:");
 			for (Instruction instruction : Instructions.getInstance())
 			{
 				System.out.println("\tInstruction for plane " + instruction.planeId + " contains waypoints:");
@@ -52,12 +54,12 @@ public class Simulator
 				{
 					System.out.println("\t\t" + waypoint);
 				}
-			}
+			}*/
 			// End Debugging.
 
 			simulator.advance(timer.getDeltaTime());
 
-			JSON.toObjectFile(Data.getInstance(), "data.json");
+			JSON.toObjectFile(Data.getInstance(), SimulatorConfig.getInstance().dataFilePath);
 
 			if (SimulatorConfig.getInstance().frameRateCap != 0)
 			{
@@ -70,32 +72,26 @@ public class Simulator
 	{
 		for (Instruction instruction : Instructions.getInstance())
 		{
-			Plane plane = null;
-			for (Plane currentPlane : Data.getInstance().planes)
+			for (Plane plane : Data.getInstance().planes)
 			{
-				if (currentPlane.id == instruction.planeId)
+				if (plane.id == instruction.planeId)
 				{
-					plane = currentPlane;
-				}
-			}
+					// Ignore waypoints before the current one.
+					for (int index = plane.currentWaypointIndex; index < instruction.waypoints.size(); index++)
+					{
+						if (index < plane.waypoints.size())
+						{
+							// Replace existing waypoints.
+							plane.waypoints.set(index, instruction.waypoints.get(index));
+						}
+						else
+						{
+							// Append new waypoints.
+							plane.waypoints.add(instruction.waypoints.get(index));
+						}
+					}
 
-			if (plane == null)
-			{
-				continue;
-			}
-
-			// Ignore waypoints before the current one.
-			for (int index = plane.currentWaypointIndex; index < instruction.waypoints.size(); index++)
-			{
-				if (index < plane.waypoints.size())
-				{
-					// Replace existing waypoints.
-					plane.waypoints.set(index, instruction.waypoints.get(index));
-				}
-				else
-				{
-					// Append new waypoints.
-					plane.waypoints.add(instruction.waypoints.get(index));
+					break;
 				}
 			}
 		}
@@ -123,6 +119,8 @@ public class Simulator
 			spawnDelta = 0.0f;
 		}
 
+		Set<Plane> collidedPlanes = new HashSet<Plane>();
+
 		Iterator<Plane> iterator = Data.getInstance().planes.iterator();
 		while (iterator.hasNext())
 		{
@@ -147,9 +145,32 @@ public class Simulator
 			}
 
 			plane.heading.rotate(turnAngle);
-			plane.rotation += turnAngle;
+			plane.rotation = plane.heading.getRotation();
 
+			plane.fuel -= 0.5f * deltaTime;
 			plane.position.add(Vectorf2.multiply(plane.heading, plane.speed * deltaTime));
+
+			for (Plane otherPlane : Data.getInstance().planes)
+			{
+				// Cannot collide with itself...
+				if (otherPlane == plane)
+				{
+					continue;
+				}
+
+				if (Vectorf2.subtract(otherPlane.getPosition(), plane.getPosition()).getMagnitude() <
+						otherPlane.collisionRadius + plane.collisionRadius)
+				{
+					System.out.println("Plane " + plane.id + " has collided with Plane " + otherPlane.id);
+					collidedPlanes.add(plane);
+					collidedPlanes.add(otherPlane);
+				}
+			}
+
+			if (collidedPlanes.contains(plane))
+			{
+				continue;
+			}
 
 			if (plane.position.x < SimulatorConfig.getInstance().boundary.min.x ||
 					plane.position.x > SimulatorConfig.getInstance().boundary.max.x ||
@@ -157,7 +178,15 @@ public class Simulator
 					plane.position.y > SimulatorConfig.getInstance().boundary.max.y)
 			{
 				iterator.remove();
-				System.out.println("Plane " + plane.id + " has left the building (" + plane.position + ").");
+				System.out.println("Plane " + plane.id + " has left the building (" + plane.position + ", fuel: " + plane.fuel + ").");
+				continue;
+			}
+
+			if (plane.fuel <= 0.0f)
+			{
+				iterator.remove();
+				System.out.println("Plane " + plane.id + " ran out of fuel (" + plane.position + ").");
+				continue;
 			}
 
 			if (Math.abs(plane.position.x - SimulatorConfig.getInstance().runway.x) <
@@ -167,8 +196,11 @@ public class Simulator
 			{
 				iterator.remove();
 				System.out.println("Plane " + plane.id + " has landed!");
+				continue;
 			}
 		}
+
+		Data.getInstance().planes.removeAll(collidedPlanes);
 	}
 
 	private float getAngleToNextWaypoint(Plane plane)
@@ -196,13 +228,14 @@ public class Simulator
 	{
 		Plane plane = new Plane();
 
-		plane.collisionRadius = 10.0f;
+		plane.collisionRadius = SimulatorConfig.getInstance().collisionRadius;
 		plane.currentWaypointIndex = 0;
+		plane.fuel = 100.0f;
 		plane.heading = new Vectorf2();
 		plane.id = planeId++;
 		plane.position = new Vectorf2();
-		plane.speed = 100.0f;
-		plane.turnSpeed = (float) Math.PI;
+		plane.speed = SimulatorConfig.getInstance().speed;
+		plane.turnSpeed = (float) Math.toRadians(SimulatorConfig.getInstance().turnSpeed);
 
 		if (Math.random() >= 0.5)
 		{

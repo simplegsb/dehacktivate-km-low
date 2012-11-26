@@ -18,11 +18,6 @@ public abstract class MileHighObject
 		return position;
 	}
 
-	public float getRepulsion_radius()
-	{
-		return repulsionRadius;
-	}
-
 	public abstract String getType();
 
 	public void setCollision_radius(float collision_radius)
@@ -33,11 +28,6 @@ public abstract class MileHighObject
 	public void setPosition(Vectorf2 position)
 	{
 		this.position = position;
-	}
-
-	public void setRepulsion_radius(float repulsion_radius)
-	{
-		this.repulsionRadius = repulsion_radius;
 	}
 
 	@JSONIgnore
